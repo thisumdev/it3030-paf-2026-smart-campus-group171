@@ -18,8 +18,9 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-20 animate-slide-right">
-        <div className="h-16 flex items-center px-6 border-b border-slate-200">
+      <aside className="w-64 bg-gradient-to-b from-white via-slate-50/80 to-slate-100/50 border-r border-slate-200/60 hidden md:flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-20 animate-slide-right relative">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary-900/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        <div className="h-16 flex items-center px-6 border-b border-slate-200/60 bg-white/40 backdrop-blur-sm">
           <ShieldCheck className="h-6 w-6 text-primary-900 mr-2" />
           <span className="text-lg font-bold text-primary-900 tracking-tight">Campus Hub</span>
         </div>
@@ -37,10 +38,14 @@ const UserDashboard = () => {
             <Ticket className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform duration-300 text-slate-400 group-hover:text-primary-900" />
             My Tickets
           </a>
+          <a href="#" className="group flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
+            <Bell className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform duration-300 text-slate-400 group-hover:text-primary-900" />
+            Notifications
+          </a>
         </nav>
 
-        <div className="p-4 border-t border-slate-200">
-          <Link to="/login" className="group flex items-center px-4 py-3 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
+        <div className="p-4 border-t border-slate-200/60 bg-slate-50/30">
+          <Link to="/login" className="group flex items-center px-4 py-3 text-slate-600 hover:bg-red-50 hover:text-red-700 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
             <LogOut className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform duration-300 text-slate-400 group-hover:text-red-600" />
             Logout
           </Link>
@@ -88,41 +93,39 @@ const UserDashboard = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {/* Card 1 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group animate-slide-up delay-100">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-accent-amber opacity-10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-12 w-12 bg-orange-50 rounded-xl flex items-center justify-center text-accent-amber">
-                  <Clock className="h-6 w-6" />
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-slide-up delay-100 group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="h-10 w-10 bg-orange-50 rounded-xl flex items-center justify-center text-accent-amber group-hover:scale-110 group-hover:bg-accent-amber group-hover:text-white transition-all duration-300">
+                  <Clock className="h-5 w-5" />
                 </div>
-                <span className="text-2xl font-bold text-slate-900">2</span>
+                <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">Today</span>
               </div>
-              <h3 className="text-slate-500 text-sm font-semibold uppercase tracking-wider mb-1">Pending Bookings</h3>
-              <p className="text-slate-800 font-medium">Study Room A, Projector</p>
+              <h3 className="text-3xl font-extrabold text-slate-900 mt-2 mb-1">2</h3>
+              <p className="text-slate-500 text-sm font-medium">Pending Bookings</p>
             </div>
 
             {/* Card 2 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group animate-slide-up delay-200">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-red-500 opacity-10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-12 w-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500">
-                  <AlertCircle className="h-6 w-6" />
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-slide-up delay-200 group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="h-10 w-10 bg-red-50 rounded-xl flex items-center justify-center text-red-500 group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-300">
+                  <AlertCircle className="h-5 w-5" />
                 </div>
-                <span className="text-2xl font-bold text-slate-900">1</span>
+                <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">Action Required</span>
               </div>
-              <h3 className="text-slate-500 text-sm font-semibold uppercase tracking-wider mb-1">Open Tickets</h3>
-              <p className="text-slate-800 font-medium">Wi-Fi issue in Library</p>
+              <h3 className="text-3xl font-extrabold text-slate-900 mt-2 mb-1">1</h3>
+              <p className="text-slate-500 text-sm font-medium">Open Support Tickets</p>
             </div>
 
             {/* Card 3 (Action) */}
-            <div className="bg-primary-900 rounded-2xl p-6 shadow-md shadow-blue-900/20 hover:shadow-xl hover:shadow-blue-900/40 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group cursor-pointer border border-primary-800 text-white flex flex-col justify-center items-center text-center animate-slide-up delay-300">
-              <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-blue-600 opacity-20 rounded-full"></div>
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-accent-emerald opacity-20 rounded-full"></div>
+            <div className="bg-gradient-to-br from-primary-900 via-primary-800 to-slate-900 rounded-2xl p-6 shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/50 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group cursor-pointer border border-primary-700/50 text-white flex flex-col justify-center items-center text-center animate-slide-up delay-300">
+              <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-blue-500 opacity-20 rounded-full mix-blend-overlay"></div>
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-accent-emerald opacity-20 rounded-full mix-blend-overlay"></div>
               
-              <div className="relative z-10 h-14 w-14 bg-white/10 rounded-full flex items-center justify-center mb-3 backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
-                <PlusCircle className="h-8 w-8" />
+              <div className="relative z-10 h-16 w-16 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-md group-hover:scale-110 shadow-inner border border-white/20 transition-transform duration-300">
+                <PlusCircle className="h-8 w-8 text-white drop-shadow-md" />
               </div>
-              <h3 className="text-lg font-bold relative z-10">Quick Book</h3>
-              <p className="text-blue-200 text-sm mt-1 relative z-10">Reserve a room instantly</p>
+              <h3 className="text-xl font-extrabold text-white tracking-wide relative z-10 drop-shadow-md group-hover:text-blue-50 transition-colors">Quick Book</h3>
+              <p className="text-blue-100 font-medium text-sm mt-1 relative z-10 drop-shadow-sm">Reserve a room instantly</p>
             </div>
           </div>
 

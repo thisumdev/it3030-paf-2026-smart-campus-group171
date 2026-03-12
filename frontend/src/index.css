@@ -1,16 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", sans-serif;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "URW Palladio L", serif;
+  --color-primary-800: #1e3a5f;
+  --color-primary-900: #112240;
   --color-accent-emerald: #10b981;
   --color-accent-amber: #f59e0b;
 }
 
 @layer base {
   body {
-    @apply font-sans antialiased text-slate-900 bg-slate-50;
+    @apply font-sans antialiased text-slate-800 min-h-screen relative z-0;
+    background-color: #fcfcfd;
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(210, 225, 245, 0.45) 0%, transparent 40%),
+      radial-gradient(circle at 90% 40%, rgba(245, 235, 220, 0.45) 0%, transparent 40%),
+      radial-gradient(circle at 40% 80%, rgba(235, 220, 245, 0.35) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-slate-900 tracking-tight;
   }
 }
 

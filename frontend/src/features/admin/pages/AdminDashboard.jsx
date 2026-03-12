@@ -7,6 +7,7 @@ import {
   Settings,
   Search, 
   Bell, 
+  Megaphone,
   LogOut, 
   Shield,
   ShieldCheck,
@@ -19,8 +20,10 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 hidden md:flex animate-slide-right">
-        <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0">
+      <aside className="w-64 bg-gradient-to-b from-slate-900 via-[#162238] to-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 hidden md:flex animate-slide-right relative overflow-hidden">
+        {/* Subtle decorative mesh overlay for the admin sidebar */}
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-blue-900/10 to-transparent pointer-events-none"></div>
+        <div className="h-16 flex items-center px-6 border-b border-slate-800/60 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
           <ShieldCheck className="h-6 w-6 text-accent-emerald mr-2" />
           <span className="text-lg font-bold text-white tracking-tight">Hub Admin</span>
         </div>
@@ -38,12 +41,17 @@ const AdminDashboard = () => {
             <CalendarCheck className="h-5 w-5 mr-3 group-hover:scale-110 group-hover:text-accent-amber transition-transform duration-300" />
             All Bookings
           </a>
-          <a href="#" className="group flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white text-slate-400 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
+          <a href="#" className="group flex items-center px-4 py-3 hover:bg-slate-800/80 hover:text-white text-slate-400 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
             <MessagesSquare className="h-5 w-5 mr-3 group-hover:scale-110 group-hover:text-red-400 transition-transform duration-300" />
             All Tickets
           </a>
-          <div className="pt-4 mt-4 border-t border-slate-800">
-            <a href="#" className="group flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white text-slate-400 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
+          <a href="#" className="group flex items-center px-4 py-3 hover:bg-slate-800/80 hover:text-white text-slate-400 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
+            <Megaphone className="h-5 w-5 mr-3 group-hover:scale-110 group-hover:text-amber-400 transition-transform duration-300" />
+            Manage Notifications
+          </a>
+          
+          <div className="pt-4 mt-4 border-t border-slate-800/60">
+            <a href="#" className="group flex items-center px-4 py-3 hover:bg-slate-800/80 hover:text-white text-slate-400 rounded-xl font-medium transition-all duration-300 hover:translate-x-1">
               <Settings className="h-5 w-5 mr-3 group-hover:scale-110 transition-transform duration-300 group-hover:rotate-45" />
               System Settings
             </a>
