@@ -28,6 +28,9 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @Column(name = "password")
+private String password;
+
     @Column(name = "oauth_provider_id")
     private String oauthProviderId;
 

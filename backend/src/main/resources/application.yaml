@@ -2,6 +2,10 @@ spring:
   application:
     name: smart-campus
 
+  sql:
+    init:
+      mode: always
+
   datasource:
     url: jdbc:sqlite:./smart-campus.db
     driver-class-name: org.sqlite.JDBC
@@ -13,6 +17,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
+    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
