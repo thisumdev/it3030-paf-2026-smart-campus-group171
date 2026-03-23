@@ -47,17 +47,14 @@ Frontend runs on → http://localhost:5173
 ```
 main          ← stable, protected, integration branch (requires PR review)
 
-feature/module1-facilities
-feature/module2-bookings
-feature/module3-tickets
-feature/module4-auth-notifications
+feature/module1-#respectivefeature
 ```
 
 ### Branch Rules
 
-- ❌ No direct push to `main`
-- ✅ All merges to `main` require **at least 1 reviewer approval**
-- ✅ All merges go through `develop` first then to `main`
+- No direct push to `main`
+- All merges to `main` require **at least 1 reviewer approval**
+- All merges go through `develop` first then to `main`
 
 ---
 
@@ -77,6 +74,8 @@ feature/module4-auth-notifications
 
 ### Member 4 — Security & Communications
 
+#### User & Auth
+
 | Method   | Endpoint               | Auth    | Status | Description                      |
 | -------- | ---------------------- | ------- | ------ | -------------------------------- |
 | `POST`   | `/api/users/register`  | Public  | 201    | Register new user                |
@@ -88,6 +87,26 @@ feature/module4-auth-notifications
 | `DELETE` | `/api/users/{id}`      | ADMIN   | 204    | Delete user                      |
 | `PUT`    | `/api/users/me`        | Any JWT | 200    | Update own profile               |
 | `DELETE` | `/api/users/me`        | Any JWT | 204    | Delete own account               |
+
+#### Notifications — User-Facing
+
+| Method   | Endpoint                          | Auth    | Status | Description                           |
+| -------- | --------------------------------- | ------- | ------ | ------------------------------------- |
+| `GET`    | `/api/notifications`              | Any JWT | 200    | Get own notifications (newest first)  |
+| `GET`    | `/api/notifications/unread-count` | Any JWT | 200    | Get unread notification count         |
+| `GET`    | `/api/notifications/recent`       | Any JWT | 200    | Get latest 5 notifications (for bell) |
+| `PATCH`  | `/api/notifications/{id}/read`    | Any JWT | 200    | Mark a single notification as read    |
+| `PATCH`  | `/api/notifications/read-all`     | Any JWT | 200    | Mark all notifications as read        |
+| `DELETE` | `/api/notifications/{id}`         | Any JWT | 204    | Delete own notification               |
+
+#### Notifications — Admin
+
+| Method   | Endpoint                        | Auth  | Status | Description                                                       |
+| -------- | ------------------------------- | ----- | ------ | ----------------------------------------------------------------- |
+| `POST`   | `/api/admin/notifications/send` | ADMIN | 201    | Send notification — targets: `USER` / `SELECTED` / `ROLE` / `ALL` |
+| `GET`    | `/api/admin/notifications`      | ADMIN | 200    | List all notifications (`?userId=` `?type=` `?isRead=`)           |
+| `PUT`    | `/api/admin/notifications/{id}` | ADMIN | 200    | Edit a notification's title or message                            |
+| `DELETE` | `/api/admin/notifications/{id}` | ADMIN | 204    | Delete any notification                                           |
 
 ---
 
@@ -116,6 +135,12 @@ feature/module4-auth-notifications
 - [x] Full user CRUD (list, get by ID, update role, delete)
 - [x] Global exception handling with proper HTTP status codes
 - [x] HATEOAS links on all responses
+- [x] Notification entity with type, title, message, referenceId, referenceType, read flag
+- [x] User-facing notification endpoints (fetch, unread count, bell preview, mark read, delete)
+- [x] Admin notification send — targets: `USER`, `SELECTED`, `ROLE`, `ALL`
+- [x] Admin notification management (list with filters, update, delete)
+- [x] Internal `notify()` integration method for Bookings & Tickets modules to call
+- [x] Auto-derived titles from `NotificationType` (covers all booking & ticket states + GENERAL)
 
 **Frontend**
 
@@ -131,6 +156,11 @@ feature/module4-auth-notifications
 - [x] User profile panel (view, edit, delete own account)
 - [x] Email validation on Login & Signup pages
 - [x] Password strength meter on Signup page
-- [ ] Notifications module _(in progress)_
+- [x] Notifications module
+  - [x] Notification bell with unread badge (top 5 preview)
+  - [x] Mark as read (single & all)
+  - [x] Full notifications page (user-facing)
+  - [x] Admin send notification panel (USER / SELECTED / ROLE / ALL targets)
+  - [x] Admin notification management (filter by user, type, read status; edit; delete)
 
 ---
