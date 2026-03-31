@@ -29,7 +29,7 @@ public class ResourceDto {
             // "22:00" format
             String availableTo,
 
-            @Size(max = 500, message = "Description must not exceed 500 characters")
+            @Size(max = 500, message = "Description must not exceed 600 characters")
             String description,
 
             Resource.ResourceStatus status,
