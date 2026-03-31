@@ -13,6 +13,10 @@ import AdminLayout from "./features/admin/components/AdminLayout";
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
 import UserManagementPage from "./features/admin/user/pages/UserManagementPage";
 
+// ── Facility routes (Member 1) ────────────────────────────────────────────────
+import FacilitiesCataloguePage from "./features/facility/pages/FacilitiesCataloguePage";
+import FacilitiesAnalyticsPage from "./features/facility/pages/FacilitiesAnalyticsPage";
+
 function App() {
   return (
     <AuthProvider>
@@ -33,11 +37,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/user/dashboard" element={<UserDashboard />} />
-            <Route
-              path="/user/notifications"
-              element={<UserNotificationsPage />}
-            />
+            <Route path="/user/dashboard"     element={<UserDashboard />} />
+            <Route path="/user/notifications" element={<UserNotificationsPage />} />
           </Route>
 
           {/* Protected — ADMIN only (all share AdminLayout) */}
@@ -50,9 +51,15 @@ function App() {
           >
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
-            {/* <Route path="/admin/facilities" element={<FacilitiesPage />} /> */}
-            {/* <Route path="/admin/bookings" element={<BookingsPage />} /> */}
-            {/* <Route path="/admin/tickets" element={<TicketsPage />} /> */}
+
+             {/* <Route path="/admin/facilities" element={<FacilitiesPage />} /> */}
+             {/* <Route path="/admin/bookings" element={<BookingsPage />} /> */}
+             {/* <Route path="/admin/tickets" element={<TicketsPage />} /> */}
+
+            {/* ── Facility routes ── */}
+            <Route path="/admin/facilities"           element={<FacilitiesCataloguePage />} />
+            <Route path="/admin/facilities/analytics" element={<FacilitiesAnalyticsPage />} />
+
             <Route path="/admin/notifications" element={<NotificationPage />} />
           </Route>
 
