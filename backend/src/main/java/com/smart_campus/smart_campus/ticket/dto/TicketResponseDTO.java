@@ -1,8 +1,8 @@
 package com.smart_campus.smart_campus.ticket.dto;
 
-import com.smart_campus.smart_campus.ticket.entity.TicketCategory;
-import com.smart_campus.smart_campus.ticket.entity.TicketPriority;
-import com.smart_campus.smart_campus.ticket.entity.TicketStatus;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketCategory;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketPriority;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketStatus;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package com.smart_campus.smart_campus.ticket.dto;
 
-import com.smart_campus.smart_campus.ticket.entity.TicketCategory;
-import com.smart_campus.smart_campus.ticket.entity.TicketPriority;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketCategory;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

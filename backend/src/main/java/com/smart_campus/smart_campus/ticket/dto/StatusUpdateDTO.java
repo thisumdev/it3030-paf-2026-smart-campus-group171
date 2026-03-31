@@ -1,6 +1,6 @@
 package com.smart_campus.smart_campus.ticket.dto;
 
-import com.smart_campus.smart_campus.ticket.entity.TicketStatus;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

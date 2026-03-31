@@ -3,14 +3,20 @@ package com.smart_campus.smart_campus.ticket.entity;
 import com.smart_campus.smart_campus.facility.entity.Resource;
 import com.smart_campus.smart_campus.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "tickets")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Ticket {
 
     @Id
@@ -37,6 +43,7 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private TicketStatus status = TicketStatus.OPEN;
 
     @Enumerated(EnumType.STRING)
@@ -67,5 +74,19 @@ public class Ticket {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    // ─── ENUMS DEFINED INSIDE (same pattern as Booking.java) ─────────
+
+    public enum TicketStatus {
+        OPEN, IN_PROGRESS, RESOLVED, CLOSED, REJECTED
+    }
+
+    public enum TicketPriority {
+        LOW, MEDIUM, HIGH, CRITICAL
+    }
+
+    public enum TicketCategory {
+        ELECTRICAL, PLUMBING, IT_EQUIPMENT, FURNITURE, HVAC, SAFETY, OTHER
     }
 }

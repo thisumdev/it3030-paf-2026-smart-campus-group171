@@ -1,6 +1,11 @@
 package com.smart_campus.smart_campus.ticket.service;
 
-import com.smart_campus.smart_campus.facility.repository.ResourceRepository;
+import com.smart_campus.smart_campus.core.exception.CustomExceptions.BadRequestException;
+import com.smart_campus.smart_campus.core.exception.CustomExceptions.ForbiddenException;
+import com.smart_campus.smart_campus.core.exception.CustomExceptions.ResourceNotFoundException;
+import com.smart_campus.smart_campus.core.exception.CustomExceptions.FileUploadException;
+import com.smart_campus.smart_campus.ticket.repository.ResourceRepository;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketStatus;
 import com.smart_campus.smart_campus.ticket.dto.*;
 import com.smart_campus.smart_campus.ticket.entity.*;
 import com.smart_campus.smart_campus.ticket.repository.*;
@@ -34,9 +39,9 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketResponseDTO createTicket(TicketRequestDTO request, Long reporterId) {
         var reporter = userRepository.findById(reporterId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", reporterId));
         var resource = resourceRepository.findById(request.getResourceId())
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resource", request.getResourceId()));
 
         Ticket ticket = Ticket.builder()
                 .reporter(reporter)
@@ -56,7 +61,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketResponseDTO getTicketById(Long id) {
         return mapToResponse(ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", id)));
     }
 
     // ─── GET ALL TICKETS (admin) ─────────────────────────────────────
@@ -80,11 +85,14 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketResponseDTO updateStatus(Long ticketId, StatusUpdateDTO dto) {
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
         ticket.setStatus(dto.getStatus());
 
         if (dto.getStatus() == TicketStatus.REJECTED) {
+            if (dto.getReason() == null || dto.getReason().isBlank()) {
+                throw new BadRequestException("Rejection reason is required");
+            }
             ticket.setRejectionReason(dto.getReason());
         }
         if (dto.getStatus() == TicketStatus.RESOLVED) {
@@ -93,7 +101,7 @@ public class TicketServiceImpl implements TicketService {
         }
         if (dto.getAssigneeId() != null) {
             var assignee = userRepository.findById(dto.getAssigneeId())
-                    .orElseThrow(() -> new RuntimeException("Assignee not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Assignee", dto.getAssigneeId()));
             ticket.setAssignee(assignee);
         }
 
@@ -105,7 +113,7 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public void deleteTicket(Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
         ticketRepository.delete(ticket);
     }
 
@@ -114,11 +122,11 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketResponseDTO uploadImages(Long ticketId, List<MultipartFile> files) {
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
         long existing = ticketImageRepository.countByTicketId(ticketId);
         if (existing + files.size() > MAX_IMAGES) {
-            throw new RuntimeException("Maximum " + MAX_IMAGES + " images allowed per ticket");
+            throw new BadRequestException("Maximum " + MAX_IMAGES + " images allowed per ticket");
         }
 
         try {
@@ -128,8 +136,7 @@ public class TicketServiceImpl implements TicketService {
             for (MultipartFile file : files) {
                 String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
                 Path filePath = uploadPath.resolve(filename);
-                Files.copy(file.getInputStream(), filePath,
-                        StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                 TicketImage image = TicketImage.builder()
                         .ticket(ticket)
@@ -138,7 +145,7 @@ public class TicketServiceImpl implements TicketService {
                 ticketImageRepository.save(image);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store image: " + e.getMessage());
+            throw new FileUploadException("Failed to store image: " + e.getMessage());
         }
 
         return mapToResponse(ticketRepository.findById(ticketId).get());
@@ -149,9 +156,9 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public CommentResponseDTO addComment(Long ticketId, CommentRequestDTO dto, Long authorId) {
         var ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
         var author = userRepository.findById(authorId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", authorId));
 
         TicketComment comment = TicketComment.builder()
                 .ticket(ticket)
@@ -165,6 +172,9 @@ public class TicketServiceImpl implements TicketService {
     // ─── GET COMMENTS ────────────────────────────────────────────────
     @Override
     public List<CommentResponseDTO> getComments(Long ticketId) {
+        if (!ticketRepository.existsById(ticketId)) {
+            throw new ResourceNotFoundException("Ticket", ticketId);
+        }
         return ticketCommentRepository
                 .findByTicketIdOrderByCreatedAtAsc(ticketId)
                 .stream()
@@ -177,9 +187,9 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public void deleteComment(Long commentId, Long currentUserId) {
         TicketComment comment = ticketCommentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", commentId));
         if (!comment.getAuthor().getId().equals(currentUserId)) {
-            throw new RuntimeException("Not authorized to delete this comment");
+            throw new ForbiddenException("You can only delete your own comments");
         }
         ticketCommentRepository.delete(comment);
     }

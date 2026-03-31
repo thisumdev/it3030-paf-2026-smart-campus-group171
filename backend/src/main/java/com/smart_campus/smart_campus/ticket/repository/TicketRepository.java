@@ -1,7 +1,7 @@
 package com.smart_campus.smart_campus.ticket.repository;
 
 import com.smart_campus.smart_campus.ticket.entity.Ticket;
-import com.smart_campus.smart_campus.ticket.entity.TicketStatus;
+import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
