@@ -233,6 +233,18 @@ public class TicketServiceImpl implements TicketService {
         ticketCommentRepository.delete(comment);
     }
 
+    // ─── LIST RESOURCES ──────────────────────────────────────────────
+    @Override
+    public List<ResourceDTO> getResources() {
+        return resourceRepository.findAll().stream()
+                .map(r -> ResourceDTO.builder()
+                        .id(r.getId())
+                        .name(r.getName())
+                        .location(r.getLocation())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     // ─── MAPPERS ─────────────────────────────────────────────────────
     private TicketResponseDTO mapToResponse(Ticket ticket) {
         return TicketResponseDTO.builder()

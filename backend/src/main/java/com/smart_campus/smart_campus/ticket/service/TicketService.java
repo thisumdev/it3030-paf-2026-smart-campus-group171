@@ -16,4 +16,5 @@ public interface TicketService {
     CommentResponseDTO addComment(Long ticketId, CommentRequestDTO dto, Long authorId);
     List<CommentResponseDTO> getComments(Long ticketId);
     void deleteComment(Long commentId, Long currentUserId);
+    List<ResourceDTO> getResources();
 }
