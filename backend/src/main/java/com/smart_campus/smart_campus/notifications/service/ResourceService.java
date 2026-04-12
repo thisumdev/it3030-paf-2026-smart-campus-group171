@@ -51,7 +51,6 @@ public class ResourceService {
             throw new CustomExceptions.ResourceConflictException(
                     "A resource with the name '" + req.name() + "' already exists.");
         }
-
         Resource resource = new Resource();
         applyRequest(resource, req);
         return ResourceDto.ResourceResponse.from(resourceRepository.save(resource));
@@ -83,12 +82,16 @@ public class ResourceService {
     }
 
     // ── DELETE ────────────────────────────────────────────────────────────────
+    // Deletes all linked bookings first to avoid FK constraint violations,
+    // then deletes the resource itself.
 
     @Transactional
     public void delete(Long id) {
         if (!resourceRepository.existsById(id)) {
             throw new CustomExceptions.ResourceNotFoundException("Resource", id);
         }
+        // Remove any bookings linked to this resource first
+        resourceRepository.deleteBookingsByResourceId(id);
         resourceRepository.deleteById(id);
     }
 
