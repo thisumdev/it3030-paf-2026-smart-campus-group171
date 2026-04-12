@@ -96,7 +96,7 @@ public class ResourceService {
 
     public ResourceDto.AnalyticsResponse getAnalytics() {
         long total        = resourceRepository.count();
-        long active       = resourceRepository.countByStatus(Resource.ResourceStatus.ACTIVE);
+        long active       = resourceRepository.countByStatus(Resource.ResourceStatus.AVAILABLE);
         long maintenance  = resourceRepository.countByStatus(Resource.ResourceStatus.MAINTENANCE);
         long outOfService = resourceRepository.countByStatus(Resource.ResourceStatus.OUT_OF_SERVICE);
 

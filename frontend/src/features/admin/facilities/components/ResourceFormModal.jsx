@@ -3,7 +3,7 @@ import { X, Loader2 } from "lucide-react";
 import { createResource, updateResource } from "../services/facilityApi";
 
 const RESOURCE_TYPES = ["LECTURE_HALL", "LAB", "MEETING_ROOM", "EQUIPMENT"];
-const STATUS_OPTIONS = ["ACTIVE", "MAINTENANCE", "OUT_OF_SERVICE"];
+const STATUS_OPTIONS = ["AVAILABLE", "MAINTENANCE", "OUT_OF_SERVICE"];
 
 const TYPE_LABELS = {
   LECTURE_HALL: "Lecture Hall",
@@ -20,7 +20,7 @@ const empty = {
   availableFrom: "08:00",
   availableTo: "20:00",
   description: "",
-  status: "ACTIVE",
+  status: "AVAILABLE",   // ← fixed from ACTIVE
   imageUrl: "",
 };
 
@@ -41,7 +41,7 @@ const ResourceFormModal = ({ resource, onClose, onSaved }) => {
         availableFrom: resource.availableFrom || "08:00",
         availableTo: resource.availableTo || "20:00",
         description: resource.description || "",
-        status: resource.status || "ACTIVE",
+        status: resource.status || "AVAILABLE",   // ← fixed from ACTIVE
         imageUrl: resource.imageUrl || "",
       });
     }

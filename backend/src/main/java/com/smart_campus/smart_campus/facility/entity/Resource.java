@@ -42,7 +42,7 @@ public class Resource {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ResourceStatus status = ResourceStatus.ACTIVE;
+    private ResourceStatus status = ResourceStatus.AVAILABLE;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -72,7 +72,7 @@ public class Resource {
     }
 
     public enum ResourceStatus {
-        ACTIVE,
+        AVAILABLE,
         MAINTENANCE,
         OUT_OF_SERVICE
     }

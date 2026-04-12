@@ -27,13 +27,13 @@ const TYPE_COLORS = {
 };
 
 const STATUS_BADGE = {
-  ACTIVE:         "bg-emerald-100 text-emerald-700",
+  AVAILABLE:         "bg-emerald-100 text-emerald-700",
   MAINTENANCE:    "bg-amber-100 text-amber-700",
   OUT_OF_SERVICE: "bg-red-100 text-red-700",
 };
 
 const STATUS_DOT = {
-  ACTIVE:         "bg-emerald-500",
+  AVAILABLE:         "bg-emerald-500",
   MAINTENANCE:    "bg-amber-500",
   OUT_OF_SERVICE: "bg-red-500",
 };
@@ -49,7 +49,7 @@ const DEFAULT_FILTERS = {
   name: "", type: "", location: "",
   minCapacity: "", maxCapacity: "",
   page: 0, size: 12,
-  status: "ACTIVE", // users only see active resources by default
+  status: "AVAILABLE", 
 };
 
 // ── Main Component ────────────────────────────────────────────────────────────
@@ -318,7 +318,7 @@ const UserResourceCard = ({ resource, onClick }) => (
         </h3>
         <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${STATUS_BADGE[resource.status]}`}>
           <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[resource.status]}`} />
-          {resource.status === "ACTIVE" ? "Available" : resource.status.replace(/_/g, " ")}
+          {resource.status === "AVAILABLE" ? "Available" : resource.status.replace(/_/g, " ")}
         </span>
       </div>
 
@@ -387,7 +387,7 @@ const ResourceDetailModal = ({ resource, onClose }) => (
           <h2 className="text-xl font-bold text-slate-900">{resource.name}</h2>
           <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${STATUS_BADGE[resource.status]}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[resource.status]}`} />
-            {resource.status === "ACTIVE" ? "Available" : resource.status.replace(/_/g, " ")}
+            {resource.status === "AVAILABLE" ? "Available" : resource.status.replace(/_/g, " ")}
           </span>
         </div>
 
@@ -425,7 +425,7 @@ const ResourceDetailModal = ({ resource, onClose }) => (
         </div>
 
         {/* Book button — only if ACTIVE */}
-        {resource.status === "ACTIVE" ? (
+        {resource.status === "AVAILABLE" ? (
           <button className="w-full py-3 rounded-xl font-bold bg-slate-900 text-white hover:bg-slate-700 transition-colors text-sm">
             Book This Resource
           </button>
