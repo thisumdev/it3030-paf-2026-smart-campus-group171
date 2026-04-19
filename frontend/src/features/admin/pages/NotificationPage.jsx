@@ -242,7 +242,7 @@ const SendTab = ({ showToast }) => {
       {/* Left — steps */}
       <div className="lg:col-span-2 space-y-5">
         {/* Step 1 — Circumstance */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="premium-glass rounded-2xl p-6">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">
             Step 1 — What type of notification?
           </h2>
@@ -290,7 +290,7 @@ const SendTab = ({ showToast }) => {
 
         {/* Step 2 — Sub-type (Booking / Ticket only) */}
         {circumstance && circumstance !== "GENERAL" && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 animate-slide-up">
+          <div className="premium-glass rounded-2xl p-6 animate-slide-up">
             <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">
               Step 2 — Notification event
             </h2>
@@ -317,7 +317,7 @@ const SendTab = ({ showToast }) => {
 
         {/* Step 3 — Title / Message / Reference */}
         {(circumstance === "GENERAL" || notifType) && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 animate-slide-up space-y-4">
+          <div className="premium-glass rounded-2xl p-6 animate-slide-up space-y-4">
             <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
               Step {circumstance === "GENERAL" ? "2" : "3"} — Compose
             </h2>
@@ -366,7 +366,7 @@ const SendTab = ({ showToast }) => {
 
         {/* Step — Target (General always shows; Booking/Ticket when type chosen) */}
         {(circumstance === "GENERAL" || notifType) && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 animate-slide-up">
+          <div className="premium-glass rounded-2xl p-6 animate-slide-up">
             <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">
               Step {circumstance === "GENERAL" ? "3" : "4"} — Recipients
             </h2>
@@ -531,7 +531,7 @@ const SendTab = ({ showToast }) => {
 
       {/* Right — preview + send */}
       <div className="space-y-4">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sticky top-24">
+        <div className="premium-glass rounded-2xl p-5 sticky top-24">
           <h3 className="text-sm font-bold text-slate-700 mb-4">Preview</h3>
           {!circumstance ? (
             <p className="text-xs text-slate-400 text-center py-6">
@@ -701,7 +701,7 @@ const AllTab = ({ showToast }) => {
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <div className="premium-glass rounded-2xl overflow-hidden">
       {/* Filter bar */}
       <div className="p-4 border-b border-slate-100 flex flex-wrap gap-3 items-center">
         <input
