@@ -1,10 +1,11 @@
 package com.smart_campus.smart_campus.notifications.service;
 
 import com.smart_campus.smart_campus.core.exception.CustomExceptions;
-import com.smart_campus.smart_campus.notifications.dto.ResourceDto;
+import com.smart_campus.smart_campus.facility.dto.ResourceDto;
 import com.smart_campus.smart_campus.facility.entity.Resource;
-import com.smart_campus.smart_campus.notifications.repository.ResourceRepository;
-import com.smart_campus.smart_campus.notifications.repository.ResourceSpec;
+import com.smart_campus.smart_campus.facility.repository.ResourceRepository;
+import com.smart_campus.smart_campus.facility.repository.ResourceSpec;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

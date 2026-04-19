@@ -1,7 +1,7 @@
-package com.smart_campus.smart_campus.notifications.controller;
+package com.smart_campus.smart_campus.facility.controller;
 
 import com.smart_campus.smart_campus.core.util.ApiResponse;
-import com.smart_campus.smart_campus.notifications.dto.ResourceDto;
+import com.smart_campus.smart_campus.facility.dto.ResourceDto;
 import com.smart_campus.smart_campus.facility.entity.Resource;
 import com.smart_campus.smart_campus.notifications.service.ResourceService;
 import jakarta.validation.Valid;

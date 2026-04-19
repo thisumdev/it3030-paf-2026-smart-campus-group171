@@ -1,4 +1,4 @@
-package com.smart_campus.smart_campus.notifications.dto;
+package com.smart_campus.smart_campus.facility.dto;
 
 import com.smart_campus.smart_campus.facility.entity.Resource;
 import jakarta.validation.constraints.*;

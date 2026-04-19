@@ -1,4 +1,4 @@
-package com.smart_campus.smart_campus.notifications.repository;
+package com.smart_campus.smart_campus.facility.repository;
 
 import com.smart_campus.smart_campus.facility.entity.Resource;
 import org.springframework.data.jpa.repository.JpaRepository;
