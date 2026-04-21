@@ -77,6 +77,13 @@ public class TicketController {
         return ResponseEntity.status(204).body(ApiResponse.noContent("Ticket deleted"));
     }
 
+    // GET /api/tickets/resources — list all resources for the submit form
+    @GetMapping("/resources")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<ResourceDTO>>> getResources() {
+        return ResponseEntity.ok(ApiResponse.success("Resources retrieved", ticketService.getResources()));
+    }
+
     // POST /api/tickets/{id}/images — upload up to 3 images as evidence
     @PostMapping("/{id}/images")
     @PreAuthorize("isAuthenticated()")

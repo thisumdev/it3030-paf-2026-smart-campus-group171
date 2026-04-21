@@ -12,6 +12,9 @@ import NotificationPage from "./features/admin/pages/NotificationPage";
 import AdminLayout from "./features/admin/components/AdminLayout";
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
 import UserManagementPage from "./features/admin/user/pages/UserManagementPage";
+import MyTicketsPage from "./features/tickets/pages/MyTicketsPage";
+import SubmitTicketPage from "./features/tickets/pages/SubmitTicketPage";
+import TicketDetailPage from "./features/tickets/pages/TicketDetailPage";
 
 function App() {
   return (
@@ -38,6 +41,9 @@ function App() {
               path="/user/notifications"
               element={<UserNotificationsPage />}
             />
+            <Route path="/user/tickets" element={<MyTicketsPage />} />
+            <Route path="/user/tickets/new" element={<SubmitTicketPage />} />
+            <Route path="/user/tickets/:id" element={<TicketDetailPage />} />
           </Route>
 
           {/* Protected — ADMIN only (all share AdminLayout) */}
