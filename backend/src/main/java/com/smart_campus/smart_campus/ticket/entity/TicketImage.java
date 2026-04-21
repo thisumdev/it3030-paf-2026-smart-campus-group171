@@ -1,3 +1,4 @@
+
 package com.smart_campus.smart_campus.ticket.entity;
 
 import jakarta.persistence.*;
