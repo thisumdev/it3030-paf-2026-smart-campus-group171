@@ -1,6 +1,9 @@
 package com.smart_campus.smart_campus.core.exception;
 
 
+import com.smart_campus.smart_campus.booking.exception.BookingConflictException;
+import com.smart_campus.smart_campus.booking.exception.BookingNotAuthorizedException;
+import com.smart_campus.smart_campus.booking.exception.BookingNotFoundException;
 import com.smart_campus.smart_campus.core.util.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -113,6 +117,47 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(400, message));
+    }
+
+    // ── Booking: 404 Not Found ───────────────────────
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleBookingNotFound(BookingNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "BOOKING_NOT_FOUND", "message", ex.getMessage()));
+    }
+
+    // ── Booking: 409 Conflict ────────────────────────
+    @ExceptionHandler(BookingConflictException.class)
+    public ResponseEntity<Map<String, Object>> handleBookingConflict(BookingConflictException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("error", "BOOKING_CONFLICT");
+        body.put("message", ex.getMessage());
+        body.put("conflictingSlot", Map.of(
+                "start", ex.getConflictingStart(),
+                "end", ex.getConflictingEnd()
+        ));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    // ── Booking: 403 Forbidden ───────────────────────
+    @ExceptionHandler(BookingNotAuthorizedException.class)
+    public ResponseEntity<Map<String, String>> handleBookingNotAuthorized(BookingNotAuthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "FORBIDDEN", "message", ex.getMessage()));
+    }
+
+    // ── 400 Illegal State ────────────────────────────
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalState(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "INVALID_STATE", "message", ex.getMessage()));
+    }
+
+    // ── 400 Illegal Argument ─────────────────────────
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "INVALID_ARGUMENT", "message", ex.getMessage()));
     }
 
     // ── 500 Catch-All ────────────────────────────────
