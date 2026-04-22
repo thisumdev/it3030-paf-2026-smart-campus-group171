@@ -31,8 +31,8 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Public routes */}
-          <Route path="/login"         element={<LoginPage />} />
-          <Route path="/signup"        element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
           {/* Protected — USER routes */}
@@ -43,7 +43,6 @@ function App() {
               </ProtectedRoute>
             }
           >
-<<<<<<< feature/ticketing-maintenance
             <Route path="/user/dashboard" element={<UserDashboard />} />
             <Route
               path="/user/notifications"
@@ -51,14 +50,18 @@ function App() {
             />
             <Route path="/user/tickets" element={<MyTicketsPage />} />
             <Route path="/user/tickets/new" element={<SubmitTicketPage />} />
-            <Route path="/user/tickets/assigned" element={<AssignedTicketsPage />} />
+            <Route
+              path="/user/tickets/assigned"
+              element={<AssignedTicketsPage />}
+            />
             <Route path="/user/tickets/:id" element={<TicketDetailPage />} />
-=======
-            <Route path="/user/dashboard"     element={<UserDashboard />} />
-            <Route path="/user/notifications" element={<UserNotificationsPage />} />
+            <Route path="/user/dashboard" element={<UserDashboard />} />
+            <Route
+              path="/user/notifications"
+              element={<UserNotificationsPage />}
+            />
             {/* ── User Facilities ── */}
-            <Route path="/user/facilities"    element={<UserFacilitiesPage />} />
->>>>>>> main
+            <Route path="/user/facilities" element={<UserFacilitiesPage />} />
           </Route>
 
           {/* Protected — ADMIN only */}
@@ -69,26 +72,29 @@ function App() {
               </ProtectedRoute>
             }
           >
-<<<<<<< feature/ticketing-maintenance
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
             {/* <Route path="/admin/facilities" element={<FacilitiesPage />} /> */}
             {/* <Route path="/admin/bookings" element={<BookingsPage />} /> */}
             <Route path="/admin/tickets" element={<AdminTicketsPage />} />
             <Route path="/admin/notifications" element={<NotificationPage />} />
-=======
-             {/* <Route path="/admin/facilities" element={<FacilitiesPage />} /> */}
-             {/* <Route path="/admin/bookings" element={<BookingsPage />} /> */}
-             {/* <Route path="/admin/tickets" element={<TicketsPage />} /> */}
+            {/* <Route path="/admin/facilities" element={<FacilitiesPage />} /> */}
+            {/* <Route path="/admin/bookings" element={<BookingsPage />} /> */}
+            {/* <Route path="/admin/tickets" element={<TicketsPage />} /> */}
 
             {/* ── Facility routes ── */}
-            <Route path="/admin/dashboard"            element={<AdminDashboard />} />
-            <Route path="/admin/users"                element={<UserManagementPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagementPage />} />
             {/* ── Admin Facilities ── */}
-            <Route path="/admin/facilities"           element={<FacilitiesCataloguePage />} />
-            <Route path="/admin/facilities/analytics" element={<FacilitiesAnalyticsPage />} />
-            <Route path="/admin/notifications"        element={<NotificationPage />} />
->>>>>>> main
+            <Route
+              path="/admin/facilities"
+              element={<FacilitiesCataloguePage />}
+            />
+            <Route
+              path="/admin/facilities/analytics"
+              element={<FacilitiesAnalyticsPage />}
+            />
+            <Route path="/admin/notifications" element={<NotificationPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />

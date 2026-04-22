@@ -5,36 +5,22 @@ import {
   Bell,
   LogOut,
   ShieldCheck,
-<<<<<<< feature/ticketing-maintenance
   Wrench,
-=======
   MapPin,
->>>>>>> main
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../auth/context/AuthContext";
 
-<<<<<<< feature/ticketing-maintenance
-const baseNavItems = [
+const navItems = [
   { to: "/user/dashboard", icon: Home, label: "Home" },
+  { to: "/user/facilities", icon: MapPin, label: "Facilities" },
   { to: "/user/bookings", icon: Calendar, label: "My Bookings" },
   { to: "/user/tickets", icon: Ticket, label: "My Tickets" },
   { to: "/user/notifications", icon: Bell, label: "Notifications" },
-=======
-const navItems = [
-  { to: "/user/dashboard",   icon: Home,     label: "Home" },
-  { to: "/user/facilities",  icon: MapPin,   label: "Facilities" },
-  { to: "/user/bookings",    icon: Calendar, label: "My Bookings" },
-  { to: "/user/tickets",     icon: Ticket,   label: "My Tickets" },
-  { to: "/user/notifications", icon: Bell,   label: "Notifications" },
->>>>>>> main
 ];
 
 const UserSidebar = () => {
-  const { logout, user } = useAuth();
-  const navItems = user?.role === "TECHNICIAN"
-    ? [...baseNavItems, { to: "/user/tickets/assigned", icon: Wrench, label: "Assigned to Me" }]
-    : baseNavItems;
+  const { logout } = useAuth();
 
   return (
     <aside className="w-64 bg-gradient-to-b from-slate-900 via-[#162238] to-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 hidden md:flex animate-slide-right relative overflow-hidden">

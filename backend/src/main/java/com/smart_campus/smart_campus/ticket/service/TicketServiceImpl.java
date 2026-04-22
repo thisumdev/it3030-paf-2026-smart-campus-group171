@@ -6,7 +6,7 @@ import com.smart_campus.smart_campus.core.exception.CustomExceptions.ResourceNot
 import com.smart_campus.smart_campus.core.exception.CustomExceptions.FileUploadException;
 import com.smart_campus.smart_campus.notifications.entity.Notification.NotificationType;
 import com.smart_campus.smart_campus.notifications.service.NotificationService;
-import com.smart_campus.smart_campus.ticket.repository.ResourceRepository;
+import com.smart_campus.smart_campus.ticket.repository.TicketResourceRepository;
 import com.smart_campus.smart_campus.ticket.entity.Ticket.TicketStatus;
 import com.smart_campus.smart_campus.ticket.dto.*;
 import com.smart_campus.smart_campus.ticket.entity.*;
@@ -31,7 +31,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketImageRepository ticketImageRepository;
     private final TicketCommentRepository ticketCommentRepository;
     private final UserRepository userRepository;
-    private final ResourceRepository resourceRepository;
+    private final TicketResourceRepository resourceRepository;
     private final NotificationService notificationService;
 
     private static final String UPLOAD_DIR = "uploads/tickets/";
