@@ -24,7 +24,7 @@ const UserLayout = () => {
               </div>
               <input
                 type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-full leading-5 bg-slate-50/50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-900 focus:border-primary-900 sm:text-sm transition-all duration-300 hover:bg-slate-50 hover:border-slate-300"
+                className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-full leading-5 bg-slate-50/50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-900 focus:border-primary-900 hover:bg-slate-50 hover:border-slate-300 sm:text-sm transition-all duration-300 shadow-sm"
                 placeholder="Search resources, tickets..."
               />
             </div>
@@ -37,10 +37,10 @@ const UserLayout = () => {
             <button
               onClick={() => setProfileOpen(true)}
               title="View profile"
-              className="flex items-center ml-2 cursor-pointer group"
+              className="flex items-center ml-2 cursor-pointer border-l border-slate-200 pl-4 py-1 group"
             >
-              <div className="h-9 w-9 rounded-full bg-primary-100 flex items-center justify-center border-2 border-white shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105">
-                <User className="h-5 w-5 text-primary-900" />
+              <div className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center border-2 border-slate-200 shadow-sm transition-all duration-300 group-hover:scale-105">
+                <User className="h-5 w-5 text-accent-amber" />
               </div>
               <span className="ml-2 text-sm font-medium text-slate-700 hidden sm:block group-hover:text-primary-900 transition-colors">
                 {user?.fullName || "User"}

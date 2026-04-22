@@ -235,7 +235,7 @@ const UserManagementPage = () => {
       )}
 
       {/* Search + Filter bar */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-3 animate-slide-up">
+      <div className="premium-glass rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-3 animate-slide-up">
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-slate-400" />
@@ -285,7 +285,7 @@ const UserManagementPage = () => {
       </div>
 
       {/* Table card */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-slide-up">
+      <div className="premium-glass rounded-2xl overflow-hidden animate-slide-up">
         {/* Loading state */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-3">

@@ -209,12 +209,12 @@ const SignupPage = () => {
     `h-5 w-5 ${fieldErrors[field] ? "text-red-400" : "text-slate-400"}`;
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 to-slate-100 items-center justify-center p-4 sm:p-6 lg:p-8 animate-fade-in">
-      <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse min-h-[600px] animate-slide-up hover:shadow-[0_20px_50px_rgba(30,58,138,0.12)] transition-shadow duration-500">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 animate-fade-in relative">
+      <div className="max-w-5xl w-full premium-glass rounded-3xl overflow-hidden flex flex-col md:flex-row-reverse min-h-[600px] animate-slide-up hover:shadow-[0_20px_50px_rgba(30,58,138,0.12)] transition-all duration-500 border border-white/40">
         {/* Right Side - Branding */}
         <div className="md:w-5/12 bg-primary-900 p-10 text-white flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 left-0 -ml-20 -mt-20 w-64 h-64 rounded-full bg-accent-amber opacity-20 blur-3xl group-hover:scale-110 group-hover:opacity-30 transition-all duration-700" />
-          <div className="absolute bottom-0 right-0 -mr-20 -mb-20 w-80 h-80 rounded-full bg-blue-600 opacity-20 blur-3xl group-hover:scale-110 group-hover:opacity-30 transition-all duration-700 delay-100" />
+          <div className="absolute bottom-0 right-0 -mr-20 -mb-20 w-80 h-80 rounded-full bg-blue-500 opacity-20 blur-3xl group-hover:scale-110 group-hover:opacity-30 transition-all duration-700 delay-100" />
           <div className="relative z-10 flex items-center space-x-2 justify-end animate-slide-down delay-100">
             <span className="text-xl font-bold tracking-tight">
               Smart Campus Hub
@@ -236,7 +236,7 @@ const SignupPage = () => {
         </div>
 
         {/* Left Side - Form */}
-        <div className="md:w-7/12 p-10 sm:p-14 flex flex-col justify-center bg-white">
+        <div className="md:w-7/12 p-10 sm:p-14 flex flex-col justify-center bg-white/50 backdrop-blur-sm">
           <div className="w-full max-w-md mx-auto animate-slide-right delay-400">
             <h2 className="text-3xl font-bold text-slate-900 mb-2">
               Create Account
