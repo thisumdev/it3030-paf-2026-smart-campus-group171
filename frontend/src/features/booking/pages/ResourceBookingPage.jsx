@@ -9,6 +9,7 @@ import {
   MapPin,
   Users,
   Clock,
+  CalendarDays,
   Loader2,
   AlertCircle,
   X,
@@ -88,13 +89,14 @@ const ResourceBookingPage = () => {
 
   const blockedEvents = blockedSlots.map((slot) => ({
     id: "blocked-" + slot.id,
-    title: "🔒 Booked",
+    title: "Booked",
     start: slot.startTime,
     end: slot.endTime,
-    backgroundColor: "#94a3b8",
-    borderColor: "transparent",
-    textColor: "#fff",
+    backgroundColor: "rgba(71, 85, 105, 0.88)",
+    borderColor: "rgba(51, 65, 85, 0.35)",
+    textColor: "#f8fafc",
     display: "block",
+    classNames: ["fc-event-booked-slot"],
   }));
 
   // ── Submit handler ────────────────────────────────────────────────────────
@@ -224,44 +226,66 @@ const ResourceBookingPage = () => {
             </div>
           )}
 
-          {/* Calendar card */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-4">
-            <FullCalendar
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="timeGridWeek"
-              selectable={true}
-              selectMirror={true}
-              slotMinTime="06:00:00"
-              slotMaxTime="22:00:00"
-              scrollTime="08:00:00"
-              weekends={true}
-              headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "timeGridWeek,timeGridDay",
-              }}
-              events={blockedEvents}
-              select={(info) => {
-                setSelectedSlot({ start: info.startStr, end: info.endStr });
-                setShowModal(true);
-                setValidationError(null);
-                setSubmitError(null);
-              }}
-              eventClick={() => {}}
-              height="auto"
-              eventDisplay="block"
-              nowIndicator={true}
-            />
+          {/* Calendar */}
+          <div className="mb-5 overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-md shadow-sky-900/[0.04] ring-1 ring-slate-100">
+            <div className="flex flex-col gap-0.5 border-b border-sky-100/90 bg-gradient-to-r from-sky-50/95 via-white to-indigo-50/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sky-600 shadow-sm ring-1 ring-sky-100">
+                  <CalendarDays className="h-5 w-5 stroke-[1.6]" />
+                </span>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-sky-700/85">
+                    Weekly schedule
+                  </p>
+                  <p className="text-sm font-semibold text-slate-800">
+                    Drag across an open slot to book
+                  </p>
+                </div>
+              </div>
+              
+            </div>
+            <div className="booking-calendar-shell bg-white px-2 pb-3 pt-1 sm:px-3 sm:pb-4">
+              <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView="timeGridWeek"
+                selectable={true}
+                selectMirror={true}
+                slotMinTime="06:00:00"
+                slotMaxTime="22:00:00"
+                scrollTime="08:00:00"
+                weekends={true}
+                allDaySlot={false}
+                slotDuration="00:30:00"
+                slotLabelInterval="01:00:00"
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "timeGridWeek,timeGridDay",
+                }}
+                events={blockedEvents}
+                select={(info) => {
+                  setSelectedSlot({ start: info.startStr, end: info.endStr });
+                  setShowModal(true);
+                  setValidationError(null);
+                  setSubmitError(null);
+                }}
+                eventClick={() => {}}
+                height="auto"
+                eventDisplay="block"
+                nowIndicator={true}
+              />
+            </div>
           </div>
 
-          {/* Legend */}
-          <div className="flex items-center gap-4 text-xs font-medium text-slate-500 px-1">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-slate-400 inline-block" />
-              Already booked
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-xs font-medium text-slate-600">
+            <span className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-sm bg-slate-500/90 ring-1 ring-slate-400/40" />
+              Booked (unavailable)
             </span>
-            <span className="text-slate-400">
-              · Select any white slot to create a booking
+            <span className="hidden h-4 w-px bg-slate-200 sm:inline" aria-hidden />
+            <span className="flex items-center gap-2 text-slate-500">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-indigo-200 bg-indigo-50" />
+              Free — click and drag to select
             </span>
           </div>
         </>
@@ -270,75 +294,107 @@ const ResourceBookingPage = () => {
       {/* ── Booking modal ────────────────────────────────────────────────── */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Overlay */}
           <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
             onClick={handleCloseModal}
+            aria-hidden
           />
 
-          {/* Card */}
-          <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl animate-slide-up">
-            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
-              <h2 className="text-lg font-bold text-slate-900">New Booking</h2>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-modal-title"
+            className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl shadow-sky-900/10 ring-1 ring-slate-200/70 animate-slide-up"
+          >
+            <div className="h-1 bg-gradient-to-r from-sky-800 via-sky-900 to-indigo-900" />
+
+            <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-2">
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-sky-600/90 mb-1">
+                  New booking
+                </p>
+                <h2
+                  id="booking-modal-title"
+                  className="text-xl font-bold text-slate-900 tracking-tight"
+                >
+                  Confirm your slot
+                </h2>
+                <p className="text-xs text-slate-500 mt-1 font-medium">
+                  Request will be sent for admin approval.
+                </p>
+              </div>
               <button
+                type="button"
                 onClick={handleCloseModal}
-                className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg hover:bg-slate-100"
+                className="shrink-0 rounded-xl p-2 text-slate-400 transition-colors hover:bg-sky-50 hover:text-sky-700"
+                aria-label="Close"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="px-6 py-5 space-y-5">
-              {/* Selected time (read only) */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700">
-                <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wide">
-                  Selected time
-                </p>
-                <p className="font-semibold">{formatDateTime(selectedSlot?.start)}</p>
-                <p className="text-slate-500 text-xs mt-0.5">
-                  → {formatDateTime(selectedSlot?.end)}
-                </p>
+            <div className="px-6 pb-6 pt-2 space-y-5">
+              <div className="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50/90 via-white to-indigo-50/30 p-4 shadow-sm">
+                <div className="flex gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sky-500 shadow-sm ring-1 ring-sky-100">
+                    <Clock className="h-5 w-5 stroke-[1.75]" />
+                  </div>
+                  <div className="min-w-0 flex-1 text-sm">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-sky-700/80">
+                      Selected time
+                    </p>
+                    <p className="mt-1 font-semibold text-slate-900 leading-snug">
+                      {formatDateTime(selectedSlot?.start)}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">
+                      <span className="text-sky-500/90">→</span>{" "}
+                      {formatDateTime(selectedSlot?.end)}
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              {/* Resource (read only) */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-slate-500">Resource:</span>
-                <span className="text-xs font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg">
-                  {resource?.name}
+              <div className="flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/60 px-3.5 py-2.5">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-sky-500 shadow-sm ring-1 ring-slate-100">
+                  <MapPin className="h-4 w-4 stroke-[1.75]" />
                 </span>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Resource
+                  </p>
+                  <p className="truncate text-sm font-semibold text-slate-800">{resource?.name}</p>
+                </div>
               </div>
 
-              {/* Validation / submit error */}
               {(validationError || submitError) && (
-                <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
-                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2.5 rounded-2xl border border-red-200/80 bg-red-50/90 px-4 py-3 text-sm text-red-800">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-500" />
                   <span>{validationError || submitError}</span>
                 </div>
               )}
 
-              {/* Purpose */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                  Purpose <span className="text-red-500">*</span>
+                <label className="mb-2 flex items-baseline gap-1.5 text-sm font-semibold text-slate-800">
+                  Purpose
+                  <span className="text-xs font-bold text-rose-500">*</span>
                 </label>
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
                   rows={3}
                   maxLength={500}
-                  placeholder="Describe the purpose of this booking…"
-                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-all duration-200 hover:border-slate-300 resize-none"
+                  placeholder="What will you use this space for?"
+                  className="w-full resize-none rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 transition-all duration-200 hover:border-sky-200 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-400/15"
                 />
-                <p className="text-xs text-slate-400 mt-1 text-right">
+                <p className="mt-1.5 text-right text-[11px] font-medium text-slate-400 tabular-nums">
                   {purpose.length}/500
                 </p>
               </div>
 
-              {/* Attendees */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label className="mb-2 block text-sm font-semibold text-slate-800">
                   Attendees{" "}
-                  <span className="text-slate-400 font-normal">(optional)</span>
+                  <span className="text-xs font-normal text-slate-400">(optional)</span>
                 </label>
                 <input
                   type="number"
@@ -346,16 +402,15 @@ const ResourceBookingPage = () => {
                   onChange={(e) => setAttendees(e.target.value)}
                   min={1}
                   placeholder="e.g. 10"
-                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-all duration-200 hover:border-slate-300"
+                  className="w-full rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 transition-all duration-200 hover:border-sky-200 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-400/15"
                 />
               </div>
 
-              {/* Actions */}
               <div className="flex gap-3 pt-1">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all duration-200"
+                  className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 shadow-sm transition-all duration-200 hover:border-sky-200 hover:bg-sky-50/80 hover:text-sky-900"
                 >
                   Cancel
                 </button>
@@ -363,7 +418,7 @@ const ResourceBookingPage = () => {
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-900 text-white text-sm font-bold hover:bg-primary-800 transition-all duration-200 hover:shadow-lg hover:shadow-primary-900/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-900 to-indigo-900 px-4 py-3 text-sm font-bold text-white shadow-md shadow-sky-900/35 transition-all duration-200 hover:from-sky-800 hover:to-indigo-800 hover:shadow-lg hover:shadow-sky-900/40 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:shadow-md disabled:active:scale-100"
                 >
                   {submitting ? (
                     <>
@@ -371,7 +426,7 @@ const ResourceBookingPage = () => {
                       Booking…
                     </>
                   ) : (
-                    "Confirm Booking"
+                    "Confirm booking"
                   )}
                 </button>
               </div>

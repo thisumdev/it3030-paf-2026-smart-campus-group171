@@ -4,9 +4,11 @@ import {
   XCircle,
   Loader2,
   AlertCircle,
+  AlertTriangle,
   RotateCcw,
   Trash2,
   Clock,
+  CalendarDays,
 } from "lucide-react";
 import {
   getNoShowBookings,
@@ -125,9 +127,11 @@ const CheckInRecordsPage = () => {
             Monitor attendance for approved bookings and manage auto-cancellations.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-slate-400">
-          <Clock className="h-5 w-5" />
-          <span className="text-sm font-medium text-slate-500">
+        <div className="flex items-center gap-2.5 rounded-xl border border-sky-100 bg-sky-50/80 px-3 py-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-500 shadow-sm">
+            <Clock className="h-4 w-4 stroke-[2]" />
+          </span>
+          <span className="text-sm font-medium text-sky-900/80">
             {allApprovedBookings.length} approved · {autoCancelledBookings.length} auto-cancelled
           </span>
         </div>
@@ -139,8 +143,8 @@ const CheckInRecordsPage = () => {
           onClick={() => setActiveTab("attendance")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
             activeTab === "attendance"
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              ? "bg-sky-800 text-white shadow-sm shadow-sky-200/40"
+              : "bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-800"
           }`}
         >
           <CheckCircle className="h-4 w-4" />
@@ -198,11 +202,13 @@ const CheckInRecordsPage = () => {
                 return (
                   <div
                     key={booking.id}
-                    className="bg-white border border-slate-100 rounded-2xl px-5 py-4 flex items-center gap-4 hover:shadow-md transition-all duration-200"
+                    className="bg-white border border-slate-100 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm hover:border-sky-200/50 hover:shadow-md transition-all duration-200"
                   >
-                    {/* Icon */}
-                    <div className="h-10 w-10 bg-slate-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-                      📅
+                    <div
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-sky-200/60 bg-gradient-to-b from-sky-50/90 to-sky-100/40 text-sky-500"
+                      aria-hidden
+                    >
+                      <CalendarDays className="h-[1.125rem] w-[1.125rem] stroke-[1.5]" />
                     </div>
 
                     {/* Details */}
@@ -267,11 +273,13 @@ const CheckInRecordsPage = () => {
               {autoCancelledBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="bg-white border border-slate-100 rounded-2xl px-5 py-4 flex items-center gap-4 hover:shadow-md transition-all duration-200"
+                  className="bg-white border border-slate-100 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm hover:border-amber-200/60 hover:shadow-md transition-all duration-200"
                 >
-                  {/* Icon */}
-                  <div className="h-10 w-10 bg-amber-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-                    ⚠️
+                  <div
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-200/80 bg-gradient-to-b from-amber-50/90 to-amber-100/50 text-amber-600"
+                    aria-hidden
+                  >
+                    <AlertTriangle className="h-[1.125rem] w-[1.125rem] stroke-[1.5]" />
                   </div>
 
                   {/* Details */}

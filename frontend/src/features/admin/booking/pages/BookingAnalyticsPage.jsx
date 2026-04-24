@@ -109,8 +109,8 @@ const BookingAnalyticsPage = () => {
   const ghosted       = analytics?.ghostedCount ?? 0;
 
   const checkInPieData = [
-    { name: "Checked In", value: analytics?.checkedInCount || 0, color: "#10b981" },
-    { name: "Auto-Cancelled", value: analytics?.ghostedCount || 0, color: "#dc2626" },
+    { name: "Checked In", value: analytics?.checkedInCount || 0, color: "#0ea5e9" },
+    { name: "Auto-Cancelled", value: analytics?.ghostedCount || 0, color: "#ea580c" },
     {
       name:  "Pending Check-in",
       value: Math.max(
@@ -119,7 +119,7 @@ const BookingAnalyticsPage = () => {
           (analytics?.checkedInCount || 0) -
           (analytics?.ghostedCount || 0)
       ),
-      color: "#94a3b8",
+      color: "#6366f1",
     },
   ].filter((d) => d.value > 0);
 

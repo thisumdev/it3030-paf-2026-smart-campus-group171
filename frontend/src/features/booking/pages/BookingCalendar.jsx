@@ -7,6 +7,7 @@ import { getMyBookings, cancelBooking } from "../../../api/bookingApi";
 import {
   X,
   Calendar,
+  CalendarDays,
   Clock,
   Users,
   MapPin,
@@ -132,57 +133,79 @@ const BookingCalendar = () => {
       <div className="flex gap-6">
         {/* ── Left: Calendar ─────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0">
-          {/* Legend */}
-          <div className="premium-glass rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 inline-block" />
+          <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-slate-600">
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 ring-1 ring-emerald-400/40" />
                 Approved
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-yellow-400 inline-block" />
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-400 ring-1 ring-amber-300/50" />
                 Pending
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-500 inline-block" />
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-red-500 ring-1 ring-red-400/40" />
                 Cancelled / Rejected
               </span>
             </div>
             <button
+              type="button"
               onClick={() => setHideCancelledRejected((v) => !v)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all ${
                 hideCancelledRejected
-                  ? "bg-slate-900 text-white border-slate-900"
-                  : "border-slate-200 text-slate-600 hover:border-slate-400 bg-white"
+                  ? "border-sky-800 bg-sky-800 text-white shadow-sm shadow-sky-900/20 hover:bg-sky-900"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-sky-200 hover:bg-sky-50 hover:text-sky-900"
               }`}
             >
-              {hideCancelledRejected ? "👁 Show All" : "🚫 Hide Cancelled/Rejected"}
+              {hideCancelledRejected ? "Show all" : "Hide cancelled / rejected"}
             </button>
           </div>
 
-          {/* Calendar */}
-          <div className="premium-glass rounded-2xl p-4">
-            <FullCalendar
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="timeGridWeek"
-              headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay",
-              }}
-              events={calendarEvents}
-              eventClick={handleEventClick}
-              height="auto"
-              eventDisplay="block"
-              nowIndicator={true}
-              scrollTime="08:00:00"
-              weekends={true}
-              slotMinTime="08:00:00"
-              slotMaxTime="22:00:00"
-            />
+          <div className="mb-5 overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-md shadow-sky-900/[0.04] ring-1 ring-slate-100">
+            <div className="flex flex-col gap-0.5 border-b border-sky-100/90 bg-gradient-to-r from-sky-50/95 via-white to-indigo-50/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sky-600 shadow-sm ring-1 ring-sky-100">
+                  <CalendarDays className="h-5 w-5 stroke-[1.6]" />
+                </span>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-sky-700/85">
+                    Your schedule
+                  </p>
+                  <p className="text-sm font-semibold text-slate-800">
+                    Week, month, or day view — tap an event for details
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs font-medium text-slate-500 sm:max-w-[240px] sm:text-right sm:pl-4">
+                Colors match booking status. Today is highlighted in blue.
+              </p>
+            </div>
+            <div className="booking-calendar-shell bg-white px-2 pb-3 pt-1 sm:px-3 sm:pb-4">
+              <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView="timeGridWeek"
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay",
+                }}
+                events={calendarEvents}
+                eventClick={handleEventClick}
+                height="auto"
+                eventDisplay="block"
+                nowIndicator={true}
+                scrollTime="08:00:00"
+                weekends={true}
+                allDaySlot={false}
+                slotDuration="00:30:00"
+                slotLabelInterval="01:00:00"
+                slotMinTime="06:00:00"
+                slotMaxTime="22:00:00"
+              />
+            </div>
           </div>
 
-          <p className="text-xs text-slate-500 mt-4 text-center">
+          <p className="text-xs text-slate-500 mt-2 text-center font-medium">
             To book a facility, go to{" "}
             <a href="/user/facilities" className="text-slate-900 font-semibold underline">
               Facilities

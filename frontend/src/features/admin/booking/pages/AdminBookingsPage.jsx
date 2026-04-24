@@ -5,6 +5,7 @@ import {
   Loader2,
   AlertCircle,
   CalendarCheck,
+  CalendarDays,
   Trash2,
 } from "lucide-react";
 import { getAllBookings, approveBooking, rejectBooking, cancelBooking, restoreBooking, deleteBooking } from "../../../../api/bookingApi";
@@ -145,9 +146,11 @@ const AdminBookingsPage = () => {
             Review and manage all facility booking requests.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-slate-400">
-          <CalendarCheck className="h-5 w-5" />
-          <span className="text-sm font-medium text-slate-500">
+        <div className="flex items-center gap-2.5 rounded-xl border border-sky-100 bg-sky-50/80 px-3 py-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-500 shadow-sm">
+            <CalendarCheck className="h-4 w-4 stroke-[2]" />
+          </span>
+          <span className="text-sm font-medium text-sky-900/80">
             {bookings.length} total bookings
           </span>
         </div>
@@ -161,8 +164,8 @@ const AdminBookingsPage = () => {
             onClick={() => setStatusFilter(s)}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
               statusFilter === s
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                ? "bg-sky-800 text-white shadow-sm shadow-sky-200/50"
+                : "bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-800"
             }`}
           >
             {s === "ALL"
@@ -206,7 +209,9 @@ const AdminBookingsPage = () => {
       {/* Empty */}
       {!loading && !error && filtered.length === 0 && (
         <div className="text-center py-20">
-          <p className="text-4xl mb-3">📅</p>
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-200/70 bg-gradient-to-b from-sky-50 to-sky-100/50 text-sky-500">
+            <CalendarDays className="h-7 w-7 stroke-[1.25]" />
+          </div>
           <p className="text-slate-600 font-semibold">No bookings found</p>
           <p className="text-slate-400 text-sm mt-1">No bookings match the selected filter.</p>
         </div>
@@ -218,11 +223,13 @@ const AdminBookingsPage = () => {
           {filtered.map((booking) => (
             <div
               key={booking.id}
-              className="bg-white border border-slate-100 rounded-2xl px-5 py-4 flex items-center gap-4 hover:shadow-md transition-all duration-200"
+              className="bg-white border border-slate-100 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm hover:border-sky-200/50 hover:shadow-md transition-all duration-200"
             >
-              {/* Icon */}
-              <div className="h-10 w-10 bg-slate-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-                📅
+              <div
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-sky-200/60 bg-gradient-to-b from-sky-50/90 to-sky-100/40 text-sky-500"
+                aria-hidden
+              >
+                <CalendarDays className="h-[1.125rem] w-[1.125rem] stroke-[1.5]" />
               </div>
 
               {/* Details */}
