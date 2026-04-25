@@ -22,6 +22,12 @@ import AdminTicketsPage from "./features/admin/tickets/pages/AdminTicketsPage";
 import FacilitiesCataloguePage from "./features/admin/facilities/pages/FacilitiesCataloguePage";
 import FacilitiesAnalyticsPage from "./features/admin/facilities/pages/FacilitiesAnalyticsPage";
 import UserFacilitiesPage from "./features/facilities/pages/UserFacilitiesPage";
+import BookingCalendar from "./features/booking/pages/BookingCalendar";
+import AdminBookingsPage from "./features/admin/booking/pages/AdminBookingsPage";
+import ResourceBookingPage from "./features/booking/pages/ResourceBookingPage";
+import CheckInPage from "./features/booking/pages/CheckInPage";
+import CheckInRecordsPage from "./features/admin/booking/pages/CheckInRecordsPage";
+import BookingAnalyticsPage from "./features/admin/booking/pages/BookingAnalyticsPage";
 
 function App() {
   return (
@@ -34,6 +40,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/checkin" element={<CheckInPage />} />
 
           {/* Protected — USER routes */}
           <Route
@@ -62,6 +69,8 @@ function App() {
             />
             {/* ── User Facilities ── */}
             <Route path="/user/facilities" element={<UserFacilitiesPage />} />
+            <Route path="/user/bookings" element={<BookingCalendar />} />
+            <Route path="/user/book/:resourceId" element={<ResourceBookingPage />} />
           </Route>
 
           {/* Protected — ADMIN only */}
@@ -90,6 +99,9 @@ function App() {
               path="/admin/facilities"
               element={<FacilitiesCataloguePage />}
             />
+            <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+            <Route path="/admin/bookings/checkins" element={<CheckInRecordsPage />} />
+            <Route path="/admin/bookings/analytics" element={<BookingAnalyticsPage />} />
             <Route
               path="/admin/facilities/analytics"
               element={<FacilitiesAnalyticsPage />}

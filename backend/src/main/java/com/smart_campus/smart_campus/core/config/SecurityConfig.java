@@ -63,6 +63,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/resources/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/bookings/checkin").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/bookings/public/**").permitAll()
                 .requestMatchers("/api/notifications/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/users/*/role").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal, X, MapPin, Users, Clock, Loader2, AlertCircle } from "lucide-react";
 import { searchResources } from "../../admin/facilities/services/facilityApi";
 
@@ -357,7 +358,9 @@ const UserResourceCard = ({ resource, onClick }) => (
 
 // ── Resource Detail Modal ─────────────────────────────────────────────────────
 
-const ResourceDetailModal = ({ resource, onClose }) => (
+const ResourceDetailModal = ({ resource, onClose }) => {
+  const navigate = useNavigate();
+  return (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
       {/* Banner */}
@@ -426,7 +429,13 @@ const ResourceDetailModal = ({ resource, onClose }) => (
 
         {/* Book button — only if ACTIVE */}
         {resource.status === "AVAILABLE" ? (
-          <button className="w-full py-3 rounded-xl font-bold bg-slate-900 text-white hover:bg-slate-700 transition-colors text-sm">
+          <button
+            onClick={() => {
+              onClose();
+              navigate(`/user/book/${resource.id}`);
+            }}
+            className="w-full py-3 rounded-xl font-bold bg-slate-900 text-white hover:bg-slate-700 transition-colors text-sm"
+          >
             Book This Resource
           </button>
         ) : (
@@ -437,6 +446,7 @@ const ResourceDetailModal = ({ resource, onClose }) => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default UserFacilitiesPage;

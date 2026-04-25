@@ -109,7 +109,7 @@ public class ResourceService {
                 .stream()
                 .map(row -> {
                     Resource r = (Resource) row[0];
-                    long count = (Long) row[1];
+                    long count = ((Number) row[1]).longValue();
                     return new ResourceDto.TopResourceEntry(
                             r.getId(), r.getName(), r.getType().name(), count);
                 })
@@ -118,15 +118,25 @@ public class ResourceService {
         List<ResourceDto.PeakHourEntry> peakHours = resourceRepository
                 .findBookingCountByHour()
                 .stream()
-                .map(row -> new ResourceDto.PeakHourEntry(
-                        Integer.parseInt((String) row[0]),
-                        (Long) row[1]))
+                .map(row -> {
+                    try {
+                        if (row[0] == null) return null;
+                        String hourStr = row[0].toString().trim();
+                        if (hourStr.isEmpty()) return null;
+                        return new ResourceDto.PeakHourEntry(
+                            Integer.parseInt(hourStr),
+                            ((Number) row[1]).longValue());
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                })
+                .filter(entry -> entry != null)
                 .collect(Collectors.toList());
 
         Map<String, Long> countByType = new LinkedHashMap<>();
         resourceRepository.countByType()
                 .forEach(row -> countByType.put(
-                        ((Resource.ResourceType) row[0]).name(), (Long) row[1]));
+                        ((Resource.ResourceType) row[0]).name(), ((Number) row[1]).longValue()));
 
         return new ResourceDto.AnalyticsResponse(
                 total, active, maintenance, outOfService,

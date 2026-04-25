@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   MapPin,
   CalendarCheck,
+  ClipboardCheck,
   MessagesSquare,
   Megaphone,
   Settings,
@@ -46,6 +47,20 @@ const NAV_ITEMS = [
     hoverColor: "group-hover:text-accent-amber",
   },
   {
+    to: "/admin/bookings/checkins",
+    label: "Check-in Records",
+    Icon: ClipboardCheck,
+    hoverColor: "group-hover:text-accent-amber",
+    indent: true,
+  },
+  {
+    to: "/admin/bookings/analytics",
+    label: "Booking Analytics",
+    Icon: BarChart2,
+    hoverColor: "group-hover:text-accent-amber",
+    indent: true,
+  },
+  {
     to: "/admin/tickets",
     label: "All Tickets",
     Icon: MessagesSquare,
@@ -62,9 +77,9 @@ const NAV_ITEMS = [
 const AdminSidebar = () => {
   const { logout } = useAuth();
 
-  // Split: main nav (first 6) vs system section (notifications)
-  const mainNav   = NAV_ITEMS.slice(0, 6);
-  const systemNav = NAV_ITEMS.slice(6);
+  // Split: main nav (first 8) vs system section (notifications)
+  const mainNav   = NAV_ITEMS.slice(0, 8);
+  const systemNav = NAV_ITEMS.slice(8);
 
   return (
     <aside className="w-64 bg-gradient-to-b from-slate-900 via-[#162238] to-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 hidden md:flex animate-slide-right relative overflow-hidden">

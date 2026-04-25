@@ -41,6 +41,19 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
             user-name-attribute: sub
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: smartcampus82@gmail.com
+    password: dqokvoaiarnwxzrq
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
 server:
   port: 8080
 
@@ -50,3 +63,4 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
+  base-url: http://localhost:5173
