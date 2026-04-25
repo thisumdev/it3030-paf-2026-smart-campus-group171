@@ -4,7 +4,6 @@ import { Mail, Lock, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { loginUser, initiateGoogleLogin } from "../services/authApi";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const LoginPage = () => {
@@ -20,14 +19,11 @@ const LoginPage = () => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
     setError("");
-
-    // Clear field error as soon as user starts correcting
     if (fieldErrors[id]) {
       setFieldErrors((prev) => ({ ...prev, [id]: "" }));
     }
   };
 
-  // Validate individual field on blur
   const handleBlur = (e) => {
     const { id, value } = e.target;
     if (id === "email" && value && !isValidEmail(value)) {
@@ -54,9 +50,13 @@ const LoginPage = () => {
     try {
       const authData = await loginUser(form);
       login(authData);
-      navigate(
-        authData.role === "ADMIN" ? "/admin/dashboard" : "/user/dashboard",
-      );
+      const roleRedirect =
+        authData.role === "ADMIN"
+          ? "/admin/dashboard"
+          : authData.role === "TECHNICIAN"
+            ? "/technician/dashboard"
+            : "/user/dashboard";
+      navigate(roleRedirect);
     } catch (err) {
       setError(
         err.response?.data?.message || "Login failed. Please try again.",
@@ -73,16 +73,18 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 animate-fade-in relative">
       <div className="max-w-5xl w-full premium-glass rounded-3xl overflow-hidden flex flex-col md:flex-row min-h-[600px] animate-slide-up hover:shadow-[0_20px_50px_rgba(30,58,138,0.12)] transition-all duration-500 border border-white/40">
-        {/* Left Side - Branding */}
+        {/* ── Left — Branding ── */}
         <div className="md:w-5/12 bg-primary-900 p-10 text-white flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-20 blur-3xl group-hover:scale-110 group-hover:opacity-30 transition-all duration-700" />
           <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-accent-emerald opacity-20 blur-3xl group-hover:scale-110 group-hover:opacity-30 transition-all duration-700 delay-100" />
+
           <div className="relative z-10 flex items-center space-x-2 animate-slide-down delay-100">
             <ShieldCheck className="h-8 w-8 text-accent-emerald" />
             <span className="text-xl font-bold tracking-tight">
               Smart Campus Hub
             </span>
           </div>
+
           <div className="relative z-10 mt-12 mb-12 animate-slide-right delay-200">
             <h1 className="text-4xl font-extrabold tracking-tight mb-4 text-white">
               Welcome back
@@ -92,12 +94,13 @@ const LoginPage = () => {
               raise support tickets efficiently.
             </p>
           </div>
+
           <div className="relative z-10 text-sm text-blue-200 font-medium animate-slide-up delay-300">
             &copy; {new Date().getFullYear()} University Campus Hub
           </div>
         </div>
 
-        {/* Right Side - Form */}
+        {/* ── Right — Form ── */}
         <div className="md:w-7/12 p-10 sm:p-14 flex flex-col justify-center bg-white/50 backdrop-blur-sm">
           <div className="w-full max-w-md mx-auto animate-slide-left delay-400">
             <h2 className="text-3xl font-bold text-slate-900 mb-2">Sign In</h2>
@@ -114,7 +117,7 @@ const LoginPage = () => {
             )}
 
             <div className="space-y-5">
-              {/* Email */}
+              {/* Email field */}
               <div>
                 <label
                   className="block text-sm font-medium text-slate-700 mb-1"
@@ -135,12 +138,12 @@ const LoginPage = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
+                    placeholder="student@university.edu"
                     className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 bg-slate-50 focus:bg-white hover:border-slate-300 transition-all duration-300 sm:text-sm outline-none shadow-sm ${
                       fieldErrors.email
                         ? "border-red-300 focus:ring-red-500/20 focus:border-red-400 bg-red-50 focus:bg-white"
                         : "border-slate-200 focus:ring-primary-900 focus:border-primary-900"
                     }`}
-                    placeholder="student@university.edu"
                   />
                 </div>
                 {fieldErrors.email && (
@@ -151,7 +154,7 @@ const LoginPage = () => {
                 )}
               </div>
 
-              {/* Password */}
+              {/* Password field */}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label
@@ -179,12 +182,12 @@ const LoginPage = () => {
                     value={form.password}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
+                    placeholder="••••••••"
                     className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 bg-slate-50 focus:bg-white hover:border-slate-300 transition-all duration-300 sm:text-sm outline-none shadow-sm ${
                       fieldErrors.password
                         ? "border-red-300 focus:ring-red-500/20 focus:border-red-400 bg-red-50 focus:bg-white"
                         : "border-slate-200 focus:ring-primary-900 focus:border-primary-900"
                     }`}
-                    placeholder="••••••••"
                   />
                 </div>
                 {fieldErrors.password && (
@@ -195,6 +198,7 @@ const LoginPage = () => {
                 )}
               </div>
 
+              {/* Submit button */}
               <div className="pt-2">
                 <button
                   type="button"
@@ -229,6 +233,8 @@ const LoginPage = () => {
                   </span>
                 </div>
               </div>
+
+              {/* Google login */}
               <div className="mt-6">
                 <button
                   type="button"

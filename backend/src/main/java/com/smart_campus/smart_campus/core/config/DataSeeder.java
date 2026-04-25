@@ -16,6 +16,11 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        seedAdmin();
+        seedTechnician();
+    }
+
+    private void seedAdmin() {
         if (userRepository.findByEmail("admin@smartcampus.lk").isEmpty()) {
             User admin = new User();
             admin.setEmail("admin@smartcampus.lk");
@@ -26,6 +31,20 @@ public class DataSeeder implements CommandLineRunner {
             System.out.println("✅ Admin user created");
         } else {
             System.out.println("ℹ️ Admin user already exists, skipping.");
+        }
+    }
+
+    private void seedTechnician() {
+        if (userRepository.findByEmail("tech@smartcampus.lk").isEmpty()) {
+            User tech = new User();
+            tech.setEmail("tech@smartcampus.lk");
+            tech.setPassword(passwordEncoder.encode("Tech1234"));
+            tech.setFullName("Technician");
+            tech.setRole(User.Role.TECHNICIAN);
+            userRepository.save(tech);
+            System.out.println("✅ Technician user created");
+        } else {
+            System.out.println("ℹ️ Technician user already exists, skipping.");
         }
     }
 }

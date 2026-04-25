@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.LocalDateTime;
@@ -62,6 +63,7 @@ public class TicketServiceImpl implements TicketService {
 
     // ─── GET SINGLE TICKET ───────────────────────────────────────────
     @Override
+    @Transactional(readOnly = true)
     public TicketResponseDTO getTicketById(Long id) {
         return mapToResponse(ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id)));
@@ -69,6 +71,7 @@ public class TicketServiceImpl implements TicketService {
 
     // ─── GET ALL TICKETS (admin) ─────────────────────────────────────
     @Override
+    @Transactional(readOnly = true)
     public List<TicketResponseDTO> getAllTickets() {
         return ticketRepository.findAll().stream()
                 .map(this::mapToResponse)
@@ -77,6 +80,7 @@ public class TicketServiceImpl implements TicketService {
 
     // ─── GET MY TICKETS (user) ───────────────────────────────────────
     @Override
+    @Transactional(readOnly = true)
     public List<TicketResponseDTO> getMyTickets(Long userId) {
         return ticketRepository.findByReporterId(userId).stream()
                 .map(this::mapToResponse)
@@ -85,6 +89,7 @@ public class TicketServiceImpl implements TicketService {
 
     // ─── GET ASSIGNED TICKETS (technician) ──────────────────────────
     @Override
+    @Transactional(readOnly = true)
     public List<TicketResponseDTO> getAssignedTickets(Long technicianId) {
         return ticketRepository.findByAssigneeId(technicianId).stream()
                 .map(this::mapToResponse)
@@ -187,7 +192,8 @@ public class TicketServiceImpl implements TicketService {
             throw new FileUploadException("Failed to store image: " + e.getMessage());
         }
 
-        return mapToResponse(ticketRepository.findById(ticketId).get());
+        return mapToResponse(ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId)));
     }
 
     // ─── ADD COMMENT ─────────────────────────────────────────────────
@@ -210,6 +216,7 @@ public class TicketServiceImpl implements TicketService {
 
     // ─── GET COMMENTS ────────────────────────────────────────────────
     @Override
+    @Transactional(readOnly = true)
     public List<CommentResponseDTO> getComments(Long ticketId) {
         if (!ticketRepository.existsById(ticketId)) {
             throw new ResourceNotFoundException("Ticket", ticketId);
@@ -235,6 +242,7 @@ public class TicketServiceImpl implements TicketService {
 
     // ─── LIST RESOURCES ──────────────────────────────────────────────
     @Override
+    @Transactional(readOnly = true)
     public List<ResourceDTO> getResources() {
         return resourceRepository.findAll().stream()
                 .map(r -> ResourceDTO.builder()
