@@ -10,9 +10,11 @@ import {
   X,
   UserCheck,
   Filter,
+  FileDown, // ← NEW
 } from "lucide-react";
 import { useAuth } from "../../../auth/context/AuthContext";
 import { fetchAllUsers, deleteUserById } from "../services/adminApi";
+import { generateUserReport } from "../services/generateUserReport"; // ← NEW
 
 // ── Role badge ────────────────────────────────────────────────────────────────
 const RoleBadge = ({ role }) => {
@@ -106,9 +108,7 @@ const AVATAR_COLORS = [
   "bg-teal-600",
   "bg-orange-600",
 ];
-
 const getAvatarColor = (id) => AVATAR_COLORS[id % AVATAR_COLORS.length];
-
 const getInitials = (name) => {
   if (!name) return "?";
   const parts = name.trim().split(" ");
@@ -130,6 +130,7 @@ const UserManagementPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [reportLoading, setReportLoading] = useState(false); // ← NEW
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -168,6 +169,19 @@ const UserManagementPage = () => {
     },
     { USER: 0, ADMIN: 0, TECHNICIAN: 0 },
   );
+
+  // ← NEW: trigger PDF generation
+  const handleGenerateReport = async () => {
+    if (filteredUsers.length === 0) return;
+    setReportLoading(true);
+    try {
+      await generateUserReport(filteredUsers, { roleFilter, searchQuery });
+    } catch (err) {
+      console.error("Report generation failed:", err);
+    } finally {
+      setReportLoading(false);
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!userToDelete) return;
@@ -217,6 +231,20 @@ const UserManagementPage = () => {
             <Wrench className="h-3.5 w-3.5" />
             {counts.TECHNICIAN} Technicians
           </span>
+
+          {/* ← NEW: Generate Report button */}
+          <button
+            onClick={handleGenerateReport}
+            disabled={reportLoading || loading || filteredUsers.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-white hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          >
+            {reportLoading ? (
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <FileDown className="h-3.5 w-3.5" />
+            )}
+            {reportLoading ? "Generating…" : "Export PDF"}
+          </button>
         </div>
       </div>
 
@@ -286,7 +314,6 @@ const UserManagementPage = () => {
 
       {/* Table card */}
       <div className="premium-glass rounded-2xl overflow-hidden animate-slide-up">
-        {/* Loading state */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <RefreshCw className="h-8 w-8 text-slate-300 animate-spin" />
@@ -294,7 +321,6 @@ const UserManagementPage = () => {
           </div>
         )}
 
-        {/* Error state */}
         {!loading && error && (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <AlertTriangle className="h-8 w-8 text-red-400" />
@@ -308,7 +334,6 @@ const UserManagementPage = () => {
           </div>
         )}
 
-        {/* Empty state */}
         {!loading && !error && filteredUsers.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <Users className="h-10 w-10 text-slate-200" />
@@ -327,7 +352,6 @@ const UserManagementPage = () => {
           </div>
         )}
 
-        {/* Table */}
         {!loading && !error && filteredUsers.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -356,13 +380,10 @@ const UserManagementPage = () => {
                     key={u.id}
                     className="hover:bg-slate-50/70 transition-colors group"
                   >
-                    {/* Avatar + Name */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`h-9 w-9 rounded-full ${getAvatarColor(
-                            u.id,
-                          )} flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm`}
+                          className={`h-9 w-9 rounded-full ${getAvatarColor(u.id)} flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm`}
                         >
                           {getInitials(u.fullName)}
                         </div>
@@ -378,23 +399,15 @@ const UserManagementPage = () => {
                         </div>
                       </div>
                     </td>
-
-                    {/* Email */}
                     <td className="px-6 py-4 text-slate-600 font-medium">
                       {u.email}
                     </td>
-
-                    {/* Role */}
                     <td className="px-6 py-4">
                       <RoleBadge role={u.role} />
                     </td>
-
-                    {/* ID */}
                     <td className="px-6 py-4 text-slate-400 font-mono text-xs">
                       #{u.id}
                     </td>
-
-                    {/* Actions */}
                     <td className="px-6 py-4 text-right">
                       {u.id === user?.id ? (
                         <span className="text-xs text-slate-300 italic">
