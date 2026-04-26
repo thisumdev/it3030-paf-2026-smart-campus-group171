@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Ticket, Plus, Loader2, AlertCircle, ChevronRight } from "lucide-react";
+import { Ticket, Plus, Loader2, AlertCircle, ChevronRight, Search, X } from "lucide-react";
 import { fetchMyTickets } from "../services/ticketApi";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -32,12 +32,24 @@ function timeAgo(d) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
+const CATEGORIES = [
+  "ELECTRICAL",
+  "PLUMBING",
+  "IT_EQUIPMENT",
+  "FURNITURE",
+  "HVAC",
+  "SAFETY",
+  "OTHER",
+];
+
 const MyTicketsPage = () => {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("ALL");
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,8 +70,19 @@ const MyTicketsPage = () => {
 
   const statuses = ["ALL", "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED", "REJECTED"];
 
-  const visible =
-    filter === "ALL" ? tickets : tickets.filter((t) => t.status === filter);
+  const visible = tickets.filter((t) => {
+    if (filter !== "ALL" && t.status !== filter) return false;
+    if (categoryFilter !== "ALL" && t.category !== categoryFilter) return false;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      if (
+        !t.title?.toLowerCase().includes(q) &&
+        !t.resourceName?.toLowerCase().includes(q)
+      )
+        return false;
+    }
+    return true;
+  });
 
   return (
     <>
@@ -117,6 +140,40 @@ const MyTicketsPage = () => {
         })}
       </div>
 
+      {/* Search + category filter */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+        <div className="relative flex-1">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by title or resource…"
+            className="w-full pl-10 pr-9 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 focus:bg-white transition-all"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm text-slate-600 outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 focus:bg-white transition-all"
+        >
+          <option value="ALL">All Categories</option>
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c.replace(/_/g, " ")}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-24">
@@ -138,11 +195,18 @@ const MyTicketsPage = () => {
           <Ticket className="h-10 w-10 mb-3 opacity-30" />
           <p className="text-sm font-medium">No tickets found</p>
           <p className="text-xs mt-1">
-            {filter === "ALL"
+            {filter === "ALL" && !search && categoryFilter === "ALL"
               ? "Submit your first maintenance request."
-              : `No tickets with status "${STATUS_META[filter]?.label ?? filter}".`}
+              : "No tickets match your current filters."}
           </p>
-          {filter === "ALL" && (
+          {(search || filter !== "ALL" || categoryFilter !== "ALL") ? (
+            <button
+              onClick={() => { setSearch(""); setFilter("ALL"); setCategoryFilter("ALL"); }}
+              className="mt-3 text-xs text-slate-400 underline hover:text-slate-700"
+            >
+              Clear filters
+            </button>
+          ) : (
             <button
               onClick={() => navigate("/user/tickets/new")}
               className="mt-4 flex items-center gap-1.5 px-4 py-2 bg-primary-900 text-white text-xs font-semibold rounded-xl hover:bg-primary-800 transition-colors"

@@ -28,3 +28,4 @@ public class TicketImage {
         this.uploadedAt = LocalDateTime.now();
     }
 }
+
