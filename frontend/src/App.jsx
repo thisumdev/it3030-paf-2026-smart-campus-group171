@@ -12,11 +12,28 @@ import NotificationPage from "./features/admin/pages/NotificationPage";
 import AdminLayout from "./features/admin/components/AdminLayout";
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
 import UserManagementPage from "./features/admin/user/pages/UserManagementPage";
+import MyTicketsPage from "./features/tickets/pages/MyTicketsPage";
+import SubmitTicketPage from "./features/tickets/pages/SubmitTicketPage";
+import TicketDetailPage from "./features/tickets/pages/TicketDetailPage";
+import AssignedTicketsPage from "./features/tickets/pages/AssignedTicketsPage";
+import AdminTicketsPage from "./features/admin/tickets/pages/AdminTicketsPage";
 
-// ── Facility routes ───────────────────────────────────────────────────────────
+// ── Facility & Booking routes ─────────────────────────────────────────────────
 import FacilitiesCataloguePage from "./features/admin/facilities/pages/FacilitiesCataloguePage";
 import FacilitiesAnalyticsPage from "./features/admin/facilities/pages/FacilitiesAnalyticsPage";
 import UserFacilitiesPage from "./features/facilities/pages/UserFacilitiesPage";
+import BookingCalendar from "./features/booking/pages/BookingCalendar";
+import AdminBookingsPage from "./features/admin/booking/pages/AdminBookingsPage";
+import ResourceBookingPage from "./features/booking/pages/ResourceBookingPage";
+import CheckInPage from "./features/booking/pages/CheckInPage";
+import CheckInRecordsPage from "./features/admin/booking/pages/CheckInRecordsPage";
+import BookingAnalyticsPage from "./features/admin/booking/pages/BookingAnalyticsPage";
+
+// ── Technician routes ─────────────────────────────────────────────────────────
+import TechnicianLayout from "./features/technician/components/TechnicianLayout";
+import TechnicianDashboard from "./features/technician/pages/TechnicianDashboard";
+import TechnicianAssignments from "./features/technician/pages/TechnicianAssignments";
+import TechnicianNotifications from "./features/technician/pages/TechnicianNotifications";
 
 function App() {
   return (
@@ -25,26 +42,67 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
 
-          {/* Public routes */}
-          <Route path="/login"         element={<LoginPage />} />
-          <Route path="/signup"        element={<SignupPage />} />
+          {/* ── Public routes ── */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/checkin" element={<CheckInPage />} />
 
-          {/* Protected — USER routes */}
+          {/* ── Protected — USER ── */}
           <Route
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="USER">
                 <UserLayout />
               </ProtectedRoute>
             }
           >
-            <Route path="/user/dashboard"     element={<UserDashboard />} />
-            <Route path="/user/notifications" element={<UserNotificationsPage />} />
-            {/* ── User Facilities ── */}
-            <Route path="/user/facilities"    element={<UserFacilitiesPage />} />
+            <Route path="/user/dashboard" element={<UserDashboard />} />
+            <Route
+              path="/user/notifications"
+              element={<UserNotificationsPage />}
+            />
+            <Route path="/user/tickets" element={<MyTicketsPage />} />
+            <Route path="/user/tickets/new" element={<SubmitTicketPage />} />
+            <Route
+              path="/user/tickets/assigned"
+              element={<AssignedTicketsPage />}
+            />
+            <Route path="/user/tickets/:id" element={<TicketDetailPage />} />
+            <Route path="/user/facilities" element={<UserFacilitiesPage />} />
+            <Route path="/user/bookings" element={<BookingCalendar />} />
+            <Route
+              path="/user/book/:resourceId"
+              element={<ResourceBookingPage />}
+            />
           </Route>
 
-          {/* Protected — ADMIN only */}
+          {/* ── Protected — TECHNICIAN ── */}
+          <Route
+            element={
+              <ProtectedRoute requiredRole="TECHNICIAN">
+                <TechnicianLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route
+              path="/technician/dashboard"
+              element={<TechnicianDashboard />}
+            />
+            <Route
+              path="/technician/assignments"
+              element={<TechnicianAssignments />}
+            />
+            <Route
+              path="/technician/notifications"
+              element={<TechnicianNotifications />}
+            />
+            <Route
+              path="/technician"
+              element={<Navigate to="/technician/dashboard" replace />}
+            />
+          </Route>
+
+          {/* ── Protected — ADMIN ── */}
           <Route
             element={
               <ProtectedRoute requiredRole="ADMIN">
@@ -52,19 +110,30 @@ function App() {
               </ProtectedRoute>
             }
           >
-             {/* <Route path="/admin/facilities" element={<FacilitiesPage />} /> */}
-             {/* <Route path="/admin/bookings" element={<BookingsPage />} /> */}
-             {/* <Route path="/admin/tickets" element={<TicketsPage />} /> */}
-
-            {/* ── Facility routes ── */}
-            <Route path="/admin/dashboard"            element={<AdminDashboard />} />
-            <Route path="/admin/users"                element={<UserManagementPage />} />
-            {/* ── Admin Facilities ── */}
-            <Route path="/admin/facilities"           element={<FacilitiesCataloguePage />} />
-            <Route path="/admin/facilities/analytics" element={<FacilitiesAnalyticsPage />} />
-            <Route path="/admin/notifications"        element={<NotificationPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagementPage />} />
+            <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+            <Route path="/admin/notifications" element={<NotificationPage />} />
+            <Route
+              path="/admin/facilities"
+              element={<FacilitiesCataloguePage />}
+            />
+            <Route
+              path="/admin/facilities/analytics"
+              element={<FacilitiesAnalyticsPage />}
+            />
+            <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+            <Route
+              path="/admin/bookings/checkins"
+              element={<CheckInRecordsPage />}
+            />
+            <Route
+              path="/admin/bookings/analytics"
+              element={<BookingAnalyticsPage />}
+            />
           </Route>
 
+          {/* ── Fallback ── */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

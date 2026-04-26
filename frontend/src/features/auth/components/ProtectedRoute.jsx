@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 
 /**
  * Wraps any route that requires authentication.
- * requiredRole — optional, pass "ADMIN" to restrict to admins only.
+ * requiredRole — optional, pass "ADMIN" or "TECHNICIAN" to restrict by role.
  *
  * Flow:
  *  loading=true  → show spinner (AuthContext is still verifying token)
@@ -11,6 +11,14 @@ import { useAuth } from "../context/AuthContext";
  *  wrong role    → redirect to their correct dashboard
  *  all good      → render the children
  */
+
+// ── Helper — maps a role to its home dashboard ────────────────────────────────
+const dashboardFor = (role) => {
+  if (role === "ADMIN") return "/admin/dashboard";
+  if (role === "TECHNICIAN") return "/technician/dashboard";
+  return "/user/dashboard";
+};
+
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, loading } = useAuth();
 
@@ -27,13 +35,8 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   if (requiredRole && user.role !== requiredRole) {
-    // User is logged in but wrong role — send them to their correct dashboard
-    return (
-      <Navigate
-        to={user.role === "ADMIN" ? "/admin/dashboard" : "/user/dashboard"}
-        replace
-      />
-    );
+    // Logged in but wrong role — bounce to their own dashboard
+    return <Navigate to={dashboardFor(user.role)} replace />;
   }
 
   return children;

@@ -33,12 +33,7 @@ public interface ResourceRepository
     """)
     List<Object[]> findTopBookedResources(@Param("limit") int limit);
 
-    @Query("""
-        SELECT FUNCTION('strftime', '%H', b.startTime) AS hour, COUNT(b.id)
-        FROM Booking b
-        GROUP BY hour
-        ORDER BY hour
-    """)
+    @Query(value = "SELECT strftime('%H', datetime(start_time/1000, 'unixepoch')) as hour, COUNT(*) as cnt FROM bookings b GROUP BY hour ORDER BY hour", nativeQuery = true)
     List<Object[]> findBookingCountByHour();
 
     @Query("SELECT r.type, COUNT(r) FROM Resource r GROUP BY r.type")

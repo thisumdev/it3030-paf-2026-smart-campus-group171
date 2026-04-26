@@ -2,16 +2,12 @@ package com.smart_campus.smart_campus.ticket.entity;
 
 import com.smart_campus.smart_campus.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ticket_comments")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class TicketComment {
 
     @Id
@@ -26,14 +22,14 @@ public class TicketComment {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @Column(name = "comment_text", columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String commentText;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

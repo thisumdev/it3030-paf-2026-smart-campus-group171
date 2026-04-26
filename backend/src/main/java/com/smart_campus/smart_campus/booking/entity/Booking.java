@@ -1,17 +1,19 @@
 package com.smart_campus.smart_campus.booking.entity;
 
-
 import com.smart_campus.smart_campus.facility.entity.Resource;
 import com.smart_campus.smart_campus.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Booking {
@@ -34,22 +36,43 @@ public class Booking {
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
+    @Column(nullable = false, length = 500)
+    private String purpose;
+
+    @Column
+    private Integer attendees;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private BookingStatus status = BookingStatus.PENDING;
 
-    @Column(name = "qr_code_url")
-    private String qrCodeUrl;
+    @Column(name = "rejection_reason", length = 500)
+    private String rejectionReason;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "check_in_token", unique = true)
+    private String checkInToken;
+
+    @Column(name = "checked_in_at")
+    private LocalDateTime checkedInAt;
+
+    @Column(name = "reminder_sent", nullable = false)
+    @Builder.Default
+    private boolean reminderSent = false;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
-    public enum BookingStatus {
-        PENDING, APPROVED, REJECTED, CANCELLED
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

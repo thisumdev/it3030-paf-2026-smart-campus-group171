@@ -5,17 +5,18 @@ import {
   Bell,
   LogOut,
   ShieldCheck,
+  Wrench,
   MapPin,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../auth/context/AuthContext";
 
 const navItems = [
-  { to: "/user/dashboard",   icon: Home,     label: "Home" },
-  { to: "/user/facilities",  icon: MapPin,   label: "Facilities" },
-  { to: "/user/bookings",    icon: Calendar, label: "My Bookings" },
-  { to: "/user/tickets",     icon: Ticket,   label: "My Tickets" },
-  { to: "/user/notifications", icon: Bell,   label: "Notifications" },
+  { to: "/user/dashboard", icon: Home, label: "Home" },
+  { to: "/user/facilities", icon: MapPin, label: "Facilities" },
+  { to: "/user/bookings", icon: Calendar, label: "My Bookings" },
+  { to: "/user/tickets", icon: Ticket, label: "My Tickets" },
+  { to: "/user/notifications", icon: Bell, label: "Notifications" },
 ];
 
 const UserSidebar = () => {
