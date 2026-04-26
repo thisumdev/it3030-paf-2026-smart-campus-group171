@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { createBooking } from "../../../api/bookingApi";
 import axiosClient from "../../../api/axiosClient";
+import { resolveApiHttpError } from "../../../api/httpError";
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 
@@ -38,6 +39,18 @@ const formatDateTime = (isoStr) => {
   });
 };
 
+const generateWeeklyPreview = (startStr, endDateStr) => {
+  if (!startStr || !endDateStr) return [];
+  const slots = [];
+  let current = new Date(startStr);
+  const end = new Date(endDateStr + "T23:59:59");
+  while (current <= end && slots.length < 20) {
+    slots.push(new Date(current));
+    current.setDate(current.getDate() + 7);
+  }
+  return slots;
+};
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ResourceBookingPage = () => {
@@ -56,6 +69,9 @@ const ResourceBookingPage = () => {
   const [submitError, setSubmitError]     = useState(null);
   const [validationError, setValidationError] = useState(null);
   const [successMessage, setSuccessMessage]   = useState(null);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
+  const [recurrencePreview, setRecurrencePreview] = useState([]);
 
   // ── Data fetching ─────────────────────────────────────────────────────────
 
@@ -76,14 +92,22 @@ const ResourceBookingPage = () => {
         ]);
         setResource(resourceRes.data.data || resourceRes.data);
         await fetchBlockedSlots();
-      } catch {
-        setError("Failed to load resource details. Please try again.");
+      } catch (err) {
+        setError(resolveApiHttpError(err).message);
       } finally {
         setLoading(false);
       }
     };
     fetchAll();
   }, [resourceId]);
+
+  useEffect(() => {
+    if (isRecurring && selectedSlot && recurrenceEndDate) {
+      setRecurrencePreview(generateWeeklyPreview(selectedSlot.start, recurrenceEndDate));
+    } else {
+      setRecurrencePreview([]);
+    }
+  }, [isRecurring, selectedSlot, recurrenceEndDate]);
 
   // ── Calendar events ───────────────────────────────────────────────────────
 
@@ -113,31 +137,45 @@ const ResourceBookingPage = () => {
       setValidationError("Purpose is required.");
       return;
     }
+    if (isRecurring && !recurrenceEndDate) {
+      setValidationError("Please choose a repeat-until date for your recurring booking.");
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError(null);
     try {
       await createBooking({
         resourceId: Number(resourceId),
-        startTime:  toLocalISO(selectedSlot.start),
-        endTime:    toLocalISO(selectedSlot.end),
-        purpose:    purpose.trim(),
-        attendees:  attendees ? Number(attendees) : null,
+        startTime: toLocalISO(selectedSlot.start),
+        endTime: toLocalISO(selectedSlot.end),
+        purpose: purpose.trim(),
+        attendees: attendees ? Number(attendees) : null,
+        recurring: isRecurring,
+        recurrenceEndDate: isRecurring ? recurrenceEndDate : null,
       });
       setShowModal(false);
       setPurpose("");
       setAttendees("");
       setSelectedSlot(null);
-      setSuccessMessage("Booking submitted! Awaiting admin approval.");
+      setSuccessMessage(
+        isRecurring
+          ? `Recurring booking submitted! ${recurrencePreview.length} weekly sessions created, awaiting admin approval.`
+          : "Booking submitted! Awaiting admin approval.",
+      );
+      setIsRecurring(false);
+      setRecurrenceEndDate("");
+      setRecurrencePreview([]);
       await fetchBlockedSlots();
     } catch (err) {
       const conflict = err.response?.data;
       if (err.response?.status === 409) {
         setSubmitError(
-          `This resource is already booked from ${conflict.conflictingSlot?.start} to ${conflict.conflictingSlot?.end}`
+          conflict?.message ||
+            "This resource has conflicting bookings. Please choose different times.",
         );
       } else {
-        setSubmitError("Failed to create booking. Please try again.");
+        setSubmitError(resolveApiHttpError(err).message);
       }
     } finally {
       setSubmitting(false);
@@ -149,6 +187,9 @@ const ResourceBookingPage = () => {
     setSelectedSlot(null);
     setValidationError(null);
     setSubmitError(null);
+    setIsRecurring(false);
+    setRecurrenceEndDate("");
+    setRecurrencePreview([]);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -405,6 +446,65 @@ const ResourceBookingPage = () => {
                   className="w-full rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 transition-all duration-200 hover:border-sky-200 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-400/15"
                 />
               </div>
+
+              {/* Recurring toggle */}
+              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Repeat Weekly</p>
+                  <p className="text-xs text-slate-500">Book this slot every week</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRecurring((v) => !v);
+                    setRecurrenceEndDate("");
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    isRecurring ? "bg-slate-900" : "bg-slate-200"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      isRecurring ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Repeat until date picker - only shown when recurring is on */}
+              {isRecurring && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    Repeat Until <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={recurrenceEndDate}
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setRecurrenceEndDate(e.target.value)}
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-slate-900/20"
+                  />
+                  {recurrencePreview.length > 0 && (
+                    <div className="mt-3 bg-slate-50 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-slate-600 mb-2">
+                        ↻ {recurrencePreview.length} sessions will be created:
+                      </p>
+                      <div className="space-y-1 max-h-32 overflow-y-auto">
+                        {recurrencePreview.map((date, i) => (
+                          <p key={i} className="text-xs text-slate-500">
+                            {date.toLocaleDateString("en-US", {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex gap-3 pt-1">
                 <button

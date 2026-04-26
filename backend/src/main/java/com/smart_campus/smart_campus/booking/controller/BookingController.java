@@ -4,17 +4,21 @@ import com.smart_campus.smart_campus.booking.dto.BookingRequestDTO;
 import com.smart_campus.smart_campus.booking.dto.BookingResponseDTO;
 import com.smart_campus.smart_campus.booking.dto.BookingStatusUpdateDTO;
 import com.smart_campus.smart_campus.booking.entity.BookingStatus;
+import com.smart_campus.smart_campus.booking.service.BookingReportService;
 import com.smart_campus.smart_campus.booking.service.BookingService;
 import com.smart_campus.smart_campus.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -24,12 +28,14 @@ import java.util.Map;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final BookingReportService bookingReportService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<BookingResponseDTO> createBooking(@RequestBody @Valid BookingRequestDTO dto) {
-        Long userId = getCurrentUserId();
-        BookingResponseDTO result = bookingService.createBooking(userId, dto);
+    public ResponseEntity<?> createBooking(@RequestBody @Valid BookingRequestDTO dto,
+                                           org.springframework.security.core.Authentication auth) {
+        Long userId = ((com.smart_campus.smart_campus.user.entity.User) auth.getPrincipal()).getId();
+        List<BookingResponseDTO> result = bookingService.createBooking(userId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
@@ -59,6 +65,25 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getBookingAnalytics());
     }
 
+    @GetMapping("/report/daily")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<byte[]> generateDailyReport(
+            @RequestParam(required = false) String date) {
+        try {
+            LocalDate reportDate = (date != null && !date.isEmpty())
+                    ? LocalDate.parse(date)
+                    : LocalDate.now();
+            byte[] pdfBytes = bookingReportService.generateDailyReport(reportDate);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment",
+                    "booking-report-" + reportDate + ".pdf");
+            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<BookingResponseDTO> getBookingById(@PathVariable Long id) {
@@ -86,6 +111,36 @@ public class BookingController {
     public ResponseEntity<BookingResponseDTO> cancelBooking(@PathVariable Long id) {
         Long userId = getCurrentUserId();
         return ResponseEntity.ok(bookingService.cancelBooking(id, userId));
+    }
+
+    @PutMapping("/recurring/{groupId}/cancel")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> cancelRecurringSeries(@PathVariable String groupId,
+                                                   org.springframework.security.core.Authentication auth) {
+        Long userId = ((com.smart_campus.smart_campus.user.entity.User) auth.getPrincipal()).getId();
+        bookingService.cancelRecurringSeries(groupId, userId);
+        return ResponseEntity.ok(Map.of("message", "Recurring series cancelled successfully"));
+    }
+
+    @PutMapping("/recurring/{groupId}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> approveRecurringSeries(
+            @PathVariable String groupId,
+            org.springframework.security.core.Authentication auth) {
+        Long adminId = ((com.smart_campus.smart_campus.user.entity.User) auth.getPrincipal()).getId();
+        bookingService.approveRecurringSeries(groupId, adminId);
+        return ResponseEntity.ok(Map.of("message", "All sessions approved successfully"));
+    }
+
+    @PutMapping("/recurring/{groupId}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> rejectRecurringSeries(
+            @PathVariable String groupId,
+            @RequestBody BookingStatusUpdateDTO dto,
+            org.springframework.security.core.Authentication auth) {
+        Long adminId = ((com.smart_campus.smart_campus.user.entity.User) auth.getPrincipal()).getId();
+        bookingService.rejectRecurringSeries(groupId, adminId, dto.getReason());
+        return ResponseEntity.ok(Map.of("message", "All sessions rejected"));
     }
 
     @PostMapping("/checkin")

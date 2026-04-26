@@ -87,4 +87,31 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "SELECT strftime('%w', datetime(start_time/1000, 'unixepoch')) as day_of_week, COUNT(*) as cnt FROM bookings GROUP BY day_of_week ORDER BY day_of_week", nativeQuery = true)
     List<Object[]> countByDayOfWeek();
+
+    List<Booking> findByRecurrenceGroupId(String recurrenceGroupId);
+
+    @Query("SELECT b FROM Booking b WHERE b.recurrenceGroupId = :groupId AND b.startTime > :now AND b.status NOT IN ('CANCELLED', 'AUTO_CANCELLED', 'REJECTED')")
+    List<Booking> findFutureByRecurrenceGroupId(@Param("groupId") String groupId, @Param("now") java.time.LocalDateTime now);
+
+    /**
+     * SQLite stores {@code start_time} as epoch millis (see native analytics queries using {@code start_time/1000}).
+     * JPQL date comparisons do not reliably match that column — use this native filter, then load entities with fetch joins.
+     */
+    @Query(value = """
+            SELECT id FROM bookings
+            WHERE start_time >= :startMs AND start_time < :endMs
+            ORDER BY start_time ASC
+            """, nativeQuery = true)
+    List<Long> findIdsForDailyReportByStartTimeMillis(
+            @Param("startMs") long startMs,
+            @Param("endMs") long endMs);
+
+    @Query("""
+            SELECT DISTINCT b FROM Booking b
+            LEFT JOIN FETCH b.user
+            LEFT JOIN FETCH b.resource
+            WHERE b.id IN :ids
+            ORDER BY b.startTime
+            """)
+    List<Booking> findAllByIdInWithUserAndResource(@Param("ids") List<Long> ids);
 }

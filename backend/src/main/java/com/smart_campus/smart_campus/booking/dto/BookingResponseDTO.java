@@ -30,6 +30,9 @@ public class BookingResponseDTO {
     private boolean checkedIn;
     private LocalDateTime checkedInAt;
     private LocalDateTime createdAt;
+    private boolean recurring;
+    private String recurrenceGroupId;
+    private java.time.LocalDate recurrenceEndDate;
 
     public static BookingResponseDTO fromEntity(Booking booking) {
         return BookingResponseDTO.builder()
@@ -48,6 +51,9 @@ public class BookingResponseDTO {
                 .checkedIn(booking.getCheckedInAt() != null)
                 .checkedInAt(booking.getCheckedInAt())
                 .createdAt(booking.getCreatedAt())
+                .recurring(booking.isRecurring())
+                .recurrenceGroupId(booking.getRecurrenceGroupId())
+                .recurrenceEndDate(booking.getRecurrenceEndDate())
                 .build();
     }
 }

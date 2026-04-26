@@ -3,7 +3,12 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useState, useEffect } from "react";
-import { getMyBookings, cancelBooking } from "../../../api/bookingApi";
+import {
+  getMyBookings,
+  cancelBooking,
+  cancelRecurringSeries,
+} from "../../../api/bookingApi";
+import { resolveApiHttpError } from "../../../api/httpError";
 import {
   X,
   Calendar,
@@ -60,8 +65,8 @@ const BookingCalendar = () => {
       setError(null);
       const bookingsRes = await getMyBookings();
       setBookings(bookingsRes.data.data || bookingsRes.data || []);
-    } catch {
-      setError("Failed to load calendar data. Please try again.");
+    } catch (err) {
+      setError(resolveApiHttpError(err).message);
     } finally {
       setLoading(false);
     }
@@ -79,7 +84,7 @@ const BookingCalendar = () => {
 
   const calendarEvents = filteredBookings.map((b) => ({
     id: b.id,
-    title: b.purpose,
+    title: (b.recurring ? "↻ " : "") + b.purpose,
     start: b.startTime,
     end: b.endTime,
     backgroundColor: eventBg(b.status),
@@ -98,8 +103,8 @@ const BookingCalendar = () => {
       await cancelBooking(id);
       setSelectedBooking(null);
       await fetchData();
-    } catch {
-      setError("Failed to cancel booking. Please try again.");
+    } catch (err) {
+      setError(resolveApiHttpError(err).message);
     }
   };
 
@@ -305,6 +310,36 @@ const BookingCalendar = () => {
                   Cancel Booking
                 </button>
               )}
+              {selectedBooking &&
+                selectedBooking.recurring &&
+                selectedBooking.recurrenceGroupId &&
+                (selectedBooking.status === "PENDING" ||
+                  selectedBooking.status === "APPROVED") && (
+                  <button
+                    onClick={async () => {
+                      if (
+                        window.confirm(
+                          "Cancel all future sessions in this recurring series?",
+                        )
+                      ) {
+                        try {
+                          await cancelRecurringSeries(
+                            selectedBooking.recurrenceGroupId,
+                          );
+                          setSelectedBooking(null);
+                          const res = await getMyBookings();
+                          const data = res.data.data || res.data || [];
+                          setBookings(Array.isArray(data) ? data : []);
+                        } catch {
+                          alert("Failed to cancel series.");
+                        }
+                      }
+                    }}
+                    className="w-full mt-2 py-2.5 rounded-xl font-semibold text-sm border border-red-200 text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    Cancel All Future Sessions
+                  </button>
+                )}
             </div>
           </div>
         )}

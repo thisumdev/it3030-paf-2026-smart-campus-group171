@@ -131,11 +131,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleBookingConflict(BookingConflictException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", "BOOKING_CONFLICT");
-        body.put("message", ex.getMessage());
-        body.put("conflictingSlot", Map.of(
-                "start", ex.getConflictingStart(),
-                "end", ex.getConflictingEnd()
-        ));
+        String detail = ex.getConflictingEnd() != null && !ex.getConflictingEnd().isBlank()
+                ? ex.getMessage() + " " + ex.getConflictingEnd()
+                : ex.getMessage();
+        body.put("message", detail);
+        if (ex.getConflictingStart() == null || !ex.getConflictingStart().startsWith("Conflicts on:")) {
+            body.put("conflictingSlot", Map.of(
+                    "start", ex.getConflictingStart(),
+                    "end", ex.getConflictingEnd()
+            ));
+        }
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 

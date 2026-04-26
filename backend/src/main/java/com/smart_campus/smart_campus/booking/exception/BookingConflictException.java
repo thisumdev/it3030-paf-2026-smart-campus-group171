@@ -9,7 +9,7 @@ public class BookingConflictException extends RuntimeException {
     private final String conflictingEnd;
 
     public BookingConflictException(String conflictingStart, String conflictingEnd) {
-        super("Booking conflict: resource is already booked from " + conflictingStart + " to " + conflictingEnd);
+        super("Booking conflict: " + conflictingStart);
         this.conflictingStart = conflictingStart;
         this.conflictingEnd = conflictingEnd;
     }

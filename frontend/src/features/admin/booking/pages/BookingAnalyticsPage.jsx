@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getBookingAnalytics } from "../../../../api/bookingApi";
+import { getBookingAnalytics, downloadDailyReport } from "../../../../api/bookingApi";
 import {
   BarChart,
   Bar,
@@ -24,6 +24,7 @@ import {
   XCircle,
   Activity,
   Calendar,
+  Download,
 } from "lucide-react";
 
 const COLORS = ["#1e293b", "#10b981", "#f59e0b", "#3b82f6", "#8b5cf6"];
@@ -57,6 +58,8 @@ const BookingAnalyticsPage = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState("");
+  const [reportDate, setReportDate] = useState(new Date().toISOString().split("T")[0]);
+  const [reportLoading, setReportLoading] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -152,6 +155,25 @@ const BookingAnalyticsPage = () => {
 
   const userRows = analytics?.userStats || [];
 
+  const handleDownloadReport = async () => {
+    setReportLoading(true);
+    try {
+      const res = await downloadDailyReport(reportDate);
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `booking-report-${reportDate}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert("Failed to generate report. Please try again.");
+    } finally {
+      setReportLoading(false);
+    }
+  };
+
   return (
     <>
       {/* Header */}
@@ -160,6 +182,36 @@ const BookingAnalyticsPage = () => {
         <p className="text-slate-500 mt-1 text-sm font-medium">
           Insights into booking behaviour, check-in rates and user patterns.
         </p>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-base font-bold text-slate-900">Daily Booking Report</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Generate and download a PDF report of all bookings for a specific date.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="date"
+            value={reportDate}
+            onChange={(e) => setReportDate(e.target.value)}
+            className="border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-900/20"
+          />
+          <button
+            type="button"
+            onClick={handleDownloadReport}
+            disabled={reportLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-700 transition-colors disabled:opacity-50"
+          >
+            {reportLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            {reportLoading ? "Generating..." : "Download PDF"}
+          </button>
+        </div>
       </div>
 
       {/* Stat Cards */}

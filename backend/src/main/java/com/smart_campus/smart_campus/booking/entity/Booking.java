@@ -60,6 +60,15 @@ public class Booking {
     @Builder.Default
     private boolean reminderSent = false;
 
+    @Column(name = "recurrence_group_id")
+    private String recurrenceGroupId;
+
+    @Column(name = "is_recurring")
+    private boolean recurring = false;
+
+    @Column(name = "recurrence_end_date")
+    private java.time.LocalDate recurrenceEndDate;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

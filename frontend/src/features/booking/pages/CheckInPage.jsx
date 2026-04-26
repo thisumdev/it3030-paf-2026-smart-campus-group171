@@ -9,6 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import axiosClient from "../../../api/axiosClient";
+import { resolveApiHttpError } from "../../../api/httpError";
 
 const CheckInPage = () => {
   const [searchParams] = useSearchParams();
@@ -32,14 +33,7 @@ const CheckInPage = () => {
         setStatus("success");
       })
       .catch((err) => {
-        const code = err.response?.status;
-        if (code === 400 || code === 409) {
-          setErrorMessage(
-            err.response?.data?.message || "Check-in could not be completed."
-          );
-        } else {
-          setErrorMessage("Something went wrong. Please try again.");
-        }
+        setErrorMessage(resolveApiHttpError(err).message);
         setStatus("error");
       });
   }, [searchParams]);

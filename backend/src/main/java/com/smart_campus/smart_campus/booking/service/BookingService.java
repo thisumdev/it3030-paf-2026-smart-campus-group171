@@ -18,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,13 +45,12 @@ public class BookingService {
     // ── Create, lookups & lists ─────────────────────────────────────────────────
 
     /**
-     * Creates a PENDING booking after validating times and ensuring no overlap with another
-     * APPROVED booking on the same resource (same slot cannot be double-booked).
+     * Creates one or more PENDING bookings (weekly recurrence when requested), validates times,
+     * and ensures no overlap with an APPROVED booking on the same resource for any generated slot.
      */
-    public BookingResponseDTO createBooking(Long userId, BookingRequestDTO dto) {
+    public List<BookingResponseDTO> createBooking(Long userId, BookingRequestDTO dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         Resource resource = resourceRepository.findById(dto.getResourceId())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
@@ -57,39 +58,84 @@ public class BookingService {
             throw new IllegalArgumentException("End time must be after start time");
         }
 
-        List<Booking> conflicts = bookingRepository.findOverlappingBookings(
-                dto.getResourceId(), dto.getStartTime(), dto.getEndTime());
+        List<LocalDateTime[]> slots = new ArrayList<>();
 
-        if (!conflicts.isEmpty()) {
-            Booking conflicting = conflicts.get(0);
-            throw new BookingConflictException(
-                    conflicting.getStartTime().toString(),
-                    conflicting.getEndTime().toString());
+        if (dto.isRecurring() && dto.getRecurrenceEndDate() != null) {
+            LocalDateTime start = dto.getStartTime();
+            LocalDateTime end = dto.getEndTime();
+            LocalDate endDate = dto.getRecurrenceEndDate();
+
+            while (!start.toLocalDate().isAfter(endDate)) {
+                slots.add(new LocalDateTime[]{start, end});
+                start = start.plusWeeks(1);
+                end = end.plusWeeks(1);
+            }
+        } else {
+            slots.add(new LocalDateTime[]{dto.getStartTime(), dto.getEndTime()});
         }
 
-        Booking booking = Booking.builder()
-                .user(user)
-                .resource(resource)
-                .startTime(dto.getStartTime())
-                .endTime(dto.getEndTime())
-                .purpose(dto.getPurpose())
-                .attendees(dto.getAttendees())
-                .status(BookingStatus.PENDING)
-                .checkInToken(UUID.randomUUID().toString())
-                .build();
+        if (slots.isEmpty()) {
+            throw new IllegalArgumentException("No valid time slots generated for the recurrence range.");
+        }
 
-        Booking saved = bookingRepository.save(booking);
+        List<String> conflicts = new ArrayList<>();
+        for (LocalDateTime[] slot : slots) {
+            List<Booking> overlaps = bookingRepository.findOverlappingBookings(
+                    dto.getResourceId(), slot[0], slot[1]);
+            if (!overlaps.isEmpty()) {
+                conflicts.add(slot[0].toLocalDate() + " (" +
+                        slot[0].toLocalTime().withSecond(0).withNano(0) + " - " +
+                        slot[1].toLocalTime().withSecond(0).withNano(0) + ")");
+            }
+        }
+
+        if (!conflicts.isEmpty()) {
+            throw new BookingConflictException(
+                    "Conflicts on: " + String.join(", ", conflicts),
+                    "Please choose different dates or times.");
+        }
+
+        String groupId = dto.isRecurring() ? UUID.randomUUID().toString() : null;
+
+        List<Booking> savedBookings = new ArrayList<>();
+        for (LocalDateTime[] slot : slots) {
+            Booking booking = Booking.builder()
+                    .user(user)
+                    .resource(resource)
+                    .startTime(slot[0])
+                    .endTime(slot[1])
+                    .purpose(dto.getPurpose())
+                    .attendees(dto.getAttendees())
+                    .status(BookingStatus.PENDING)
+                    .checkInToken(UUID.randomUUID().toString())
+                    .recurring(dto.isRecurring())
+                    .recurrenceGroupId(groupId)
+                    .recurrenceEndDate(dto.getRecurrenceEndDate())
+                    .build();
+            savedBookings.add(bookingRepository.save(booking));
+        }
+
+        String notifMessage = dto.isRecurring()
+                ? "Your recurring booking for " + resource.getName() +
+                " (" + slots.size() + " weekly sessions starting " +
+                dto.getStartTime().toLocalDate() + ") has been submitted for approval."
+                : "Your booking for " + resource.getName() + " on " +
+                dto.getStartTime().toLocalDate() + " from " +
+                dto.getStartTime().toLocalTime().withSecond(0).withNano(0) + " to " +
+                dto.getEndTime().toLocalTime().withSecond(0).withNano(0) +
+                " has been submitted and is awaiting approval.";
+
         notificationService.notify(
                 user.getId(),
                 NotificationType.BOOKING_PENDING,
-                "Your booking for " + resource.getName() + " on " +
-                        dto.getStartTime().toLocalDate() + " from " +
-                        dto.getStartTime().toLocalTime().withSecond(0).withNano(0) + " to " +
-                        dto.getEndTime().toLocalTime().withSecond(0).withNano(0) + " has been submitted and is awaiting approval.",
-                saved.getId(),
+                notifMessage,
+                savedBookings.get(0).getId(),
                 "BOOKING"
         );
-        return BookingResponseDTO.fromEntity(saved);
+
+        return savedBookings.stream()
+                .map(BookingResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
     public BookingResponseDTO getBookingById(Long bookingId) {
@@ -122,6 +168,7 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.APPROVED);
         Booking approvedBooking = bookingRepository.save(booking);
+
         notificationService.notify(
                 booking.getUser().getId(),
                 NotificationType.BOOKING_APPROVED,
@@ -173,6 +220,71 @@ public class BookingService {
         return BookingResponseDTO.fromEntity(rejectedBooking);
     }
 
+    public void approveRecurringSeries(String groupId, Long adminUserId) {
+        List<Booking> series = bookingRepository.findByRecurrenceGroupId(groupId);
+        if (series.isEmpty()) {
+            throw new RuntimeException("No bookings found for this series");
+        }
+
+        for (Booking booking : series) {
+            if (booking.getStatus() == BookingStatus.PENDING) {
+                booking.setStatus(BookingStatus.APPROVED);
+                bookingRepository.save(booking);
+                try {
+                    bookingEmailService.sendBookingApprovalEmail(
+                            booking.getUser().getEmail(),
+                            booking.getUser().getFullName(),
+                            booking.getResource().getName(),
+                            booking.getResource().getLocation(),
+                            booking.getStartTime(),
+                            booking.getEndTime(),
+                            booking.getPurpose(),
+                            booking.getAttendees(),
+                            booking.getCheckInToken()
+                    );
+                } catch (Exception e) {
+                    System.err.println("Failed to send approval email: " + e.getMessage());
+                }
+            }
+        }
+
+        // Send one summary notification
+        Booking first = series.get(0);
+        notificationService.notify(
+                first.getUser().getId(),
+                NotificationType.BOOKING_APPROVED,
+                "Your recurring booking series for " + first.getResource().getName() +
+                        " (" + series.size() + " sessions) has been approved.",
+                first.getId(),
+                "BOOKING"
+        );
+    }
+
+    public void rejectRecurringSeries(String groupId, Long adminUserId, String reason) {
+        List<Booking> series = bookingRepository.findByRecurrenceGroupId(groupId);
+        if (series.isEmpty()) {
+            throw new RuntimeException("No bookings found for this series");
+        }
+
+        for (Booking booking : series) {
+            if (booking.getStatus() == BookingStatus.PENDING) {
+                booking.setStatus(BookingStatus.REJECTED);
+                booking.setRejectionReason(reason);
+                bookingRepository.save(booking);
+            }
+        }
+
+        Booking first = series.get(0);
+        notificationService.notify(
+                first.getUser().getId(),
+                NotificationType.BOOKING_REJECTED,
+                "Your recurring booking series for " + first.getResource().getName() +
+                        " has been rejected. Reason: " + reason,
+                first.getId(),
+                "BOOKING"
+        );
+    }
+
     // ── Cancel (owner or admin) ─────────────────────────────────────────────────
 
     public BookingResponseDTO cancelBooking(Long bookingId, Long requestingUserId) {
@@ -205,6 +317,32 @@ public class BookingService {
                 "BOOKING"
         );
         return BookingResponseDTO.fromEntity(cancelledBooking);
+    }
+
+    public void cancelRecurringSeries(String groupId, Long requestingUserId) {
+        List<Booking> future = bookingRepository.findFutureByRecurrenceGroupId(
+                groupId, LocalDateTime.now());
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        for (Booking booking : future) {
+            boolean isOwner = booking.getUser().getId().equals(requestingUserId);
+            boolean isAdmin = requestingUser.getRole() == User.Role.ADMIN;
+            if (!isOwner && !isAdmin) {
+                throw new BookingNotAuthorizedException();
+            }
+            booking.setStatus(BookingStatus.CANCELLED);
+            bookingRepository.save(booking);
+        }
+        if (!future.isEmpty()) {
+            notificationService.notify(
+                    future.get(0).getUser().getId(),
+                    NotificationType.BOOKING_CANCELLED,
+                    "Your recurring booking series for " +
+                            future.get(0).getResource().getName() + " has been cancelled.",
+                    future.get(0).getId(),
+                    "BOOKING"
+            );
+        }
     }
 
     // ── Check-in (token link, narrow time window) ───────────────────────────────

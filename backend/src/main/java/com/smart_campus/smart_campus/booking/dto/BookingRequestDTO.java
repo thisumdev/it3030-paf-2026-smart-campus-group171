@@ -35,4 +35,9 @@ public class BookingRequestDTO {
 
     @Min(1)
     private Integer attendees;
+
+    private boolean recurring = false;
+
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd")
+    private java.time.LocalDate recurrenceEndDate;
 }
