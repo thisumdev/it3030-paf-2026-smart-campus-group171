@@ -25,7 +25,7 @@ const TYPE_LABELS = {
   EQUIPMENT:    "Equipment",
 };
 
-// ── PDF Export — clean text report, no charts ─────────────────────────────────
+// PDF Export 
 const exportToPDF = (analytics) => {
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", {
@@ -362,7 +362,7 @@ const FacilitiesAnalyticsPage = () => {
             </p>
           </div>
 
-          {/* Export PDF Button — matches existing button style */}
+          {/* Export PDF Button  */}
           <button
             onClick={handleExport}
             disabled={exporting || !analytics}
