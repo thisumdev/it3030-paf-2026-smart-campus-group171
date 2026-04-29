@@ -66,7 +66,24 @@ feature/module1-#respectivefeature
 
 ### Member 2 — Booking & Workflow
 
-> _To be updated by Member 2_
+#### Bookings — User
+
+| Method   | Endpoint             | Auth    | Status | Description                                            |
+| -------- | -------------------- | ------- | ------ | ------------------------------------------------------ |
+| `POST`   | `/api/bookings`      | Any JWT | 201    | Create booking                                         |
+| `GET`    | `/api/bookings/me`   | Any JWT | 200    | Get own bookings                                       |
+| `GET`    | `/api/bookings/{id}` | Any JWT | 200    | Get booking by ID (own booking or ADMIN)               |
+| `PUT`    | `/api/bookings/{id}` | Any JWT | 200    | Update own pending booking                             |
+| `DELETE` | `/api/bookings/{id}` | Any JWT | 204    | Cancel own booking                                     |
+
+#### Bookings — Admin
+
+| Method   | Endpoint                           | Auth  | Status | Description                                                         |
+| -------- | ---------------------------------- | ----- | ------ | ------------------------------------------------------------------- |
+| `GET`    | `/api/admin/bookings`              | ADMIN | 200    | List all bookings (`?status=` `?userId=` `?facilityId=` `?date=`)   |
+| `GET`    | `/api/admin/bookings/{id}`         | ADMIN | 200    | Get booking by ID                                                   |
+| `PATCH`  | `/api/admin/bookings/{id}/approve` | ADMIN | 200    | Approve booking                                                     |
+| `PATCH`  | `/api/admin/bookings/{id}/reject`  | ADMIN | 200    | Reject booking (reason in body)                                     |
 
 ### Member 3 — Ticketing & Maintenance
 
@@ -118,7 +135,25 @@ feature/module1-#respectivefeature
 
 ### Member 2 — Booking & Workflow
 
-> _To be updated by Member 2_
+**Backend**
+
+- [x] Booking entity with status lifecycle (PENDING → APPROVED / REJECTED / CANCELLED)
+- [x] Full booking CRUD endpoints
+- [x] Conflict detection (prevent double-booking of same facility/time slot)
+- [x] Role-based access control on booking actions
+- [x] Admin approval and rejection workflow with reason field
+- [x] Integration with notification system via notify() for status changes
+- [x] Global exception handling with proper HTTP status codes
+- [x] HATEOAS links on all responses
+
+**Frontend**
+
+- [x] Booking creation form with facility and time slot selection
+- [x] My Bookings page (view, cancel own bookings)
+- [x] Booking detail view with status badge
+- [x] Admin Bookings management page (filter by status, user, facility, date)
+- [x] Admin approve/reject actions with confirmation dialog
+- [x] Real-time status updates reflected in UI after actions
 
 ### Member 3 — Ticketing & Maintenance
 
