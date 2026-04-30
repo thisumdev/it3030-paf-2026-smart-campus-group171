@@ -62,7 +62,15 @@ feature/module1-#respectivefeature
 
 ### Member 1 — Facilities & Assets Catalogue
 
-> _To be updated by Member 1_
+| Method   | Endpoint                         | Auth    | Status | Description                                                                           |
+| -------- | -------------------------------- | ------- | ------ | --------------------------------------------------------------------------------------|
+| `GET`    | `/api/resources`                 | Public  | 200    | Get paginated resources with filters: `name`, `type`, `status`,`location`,            |                  |          |                                  |         |        |       `minCapacity`,`maxCapacity`, `page`, `size`, `sortBy`, `sortDir`                |
+| `GET`    | `/api/resources/{id}`            | Public  | 200    | Get resource by ID                                                                    |
+| `POST`   | `/api/resources`                 | ADMIN   | 201    | Create a new resource                                                                 |
+| `PUT`    | `/api/resources/{id}`            | ADMIN   | 200    | Full update of an existing resource                                                   |
+| `PATCH`  | `/api/resources/{id}/status`     | ADMIN   | 200    | Update resource status: `AVAILABLE`, `MAINTENANCE`, `OUT_OF_SERVICE`                  |
+| `DELETE` | `/api/resources/{id}`            | ADMIN   | 200    | Delete a resource and associated bookings                                             |
+| `GET`    | `/api/resources/analytics`       | ADMIN   | 200    | Get resource analytics including counts, top resources, peak hours, and count by type |
 
 ### Member 2 — Booking & Workflow
 
@@ -131,7 +139,34 @@ feature/module1-#respectivefeature
 
 ### Member 1 — Facilities & Assets Catalogue
 
-> _To be updated by Member 1_
+**Backend**
+
+- [x] Resource entity with fields for name, type, capacity, location, availability count, description, image URL, and status
+- [x] Resource statuses implemented: `AVAILABLE`, `MAINTENANCE`, `OUT_OF_SERVICE`
+- [x] Layered backend architecture: Entity, Repository, Service, Controller
+- [x] JPA Repository and JpaSpecificationExecutor used for resource queries
+- [x] Dynamic filtering by name, type, status, location, and capacity range
+- [x] Public resource browsing endpoints
+- [x] Admin-only create, update, status update, and delete endpoints
+- [x] Duplicate resource name handling with HTTP 409 Conflict
+- [x] 404 handling for missing resources
+- [x] Standard `ApiResponse` wrapper used for responses
+- [x] Usage analytics endpoint with total resources, active resources, maintenance resources, out-of-service resources, top resources, peak hours, and count by type
+- [x] Postman testing completed for all resource endpoints
+
+**Frontend**
+
+- [x] Admin Facilities & Assets Catalogue page
+- [x] Resource grid and list views
+- [x] Filtering by name, type, status, location, and capacity
+- [x] Create, edit, view, delete, and status update actions
+- [x] Resource form modal
+- [x] Status update modal
+- [x] Delete confirmation modal
+- [x] Usage Analytics page with charts for booking trends, top booked resources, and resource distribution
+- [x] Admin dashboard resource statistics
+- [x] User Facilities page for browsing and filtering resources
+- [x] Resource detail view with booking integration readiness
 
 ### Member 2 — Booking & Workflow
 
